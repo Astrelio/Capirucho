@@ -1,0 +1,31 @@
+el-capirucho-workspace/
+├── .env.example                  # Variables vacías para Zavu, abaco, fal, drop* y n8n[cite: 1]
+├── .gitignore                    # Evita que se filtren las credenciales y los node_modules
+├── README.md                     # Comandos de arranque para sincronizar a los 4 devs
+├── frontend/                     # Aplicación web para el despliegue ultra-rápido en Netlify[cite: 1]
+│   ├── public/                   # Archivos estáticos y tipografía (Playfair Display)[cite: 1]
+│   └── src/
+│       ├── assets/               # Ilustración del logo con trazos sucios, estilo blanco digital[cite: 1]
+│       ├── styles/               # CSS global con reglas de alto contraste (#FFFFFF, #111111, #555555)[cite: 1]
+│       ├── components/
+│       │   ├── ui/               # Botones y modales armados con KREALI y SIMOV LABS[cite: 1]
+│       │   └── canvas/           # Lógica visual del Micro Canvas (Flow) y Macro Canvas (Crafter Station)[cite: 1]
+│       ├── features/
+│       │   ├── auth/             # Vistas exclusivas para login y registro gestionadas por Zavu[cite: 1]
+│       │   └── menu/             # Catálogo de platos y peticiones de fotos a la nube de drop*[cite: 1]
+│       ├── hooks/
+│       │   └── useAudio.ts       # Disparadores de feedback sensorial y alertas auditivas (GAME SOUND)[cite: 1]
+│       └── services/
+│           └── api.ts            # Centralización de peticiones HTTP dirigidas al backend
+└── backend/                      # API central e infraestructura de cómputo en Ai labs[cite: 1]
+    └── src/
+        ├── contracts/            # Contratos de datos JSON estrictos para "Mesa" y "Reserva" (Codex)[cite: 1]
+        ├── middlewares/
+        │   └── auth.guard.ts     # Barrera de seguridad que valida los tokens de sesión de Zavu[cite: 1]
+        ├── controllers/
+        │   ├── reservations.ts   # Conexión al motor transaccional para bloquear recursos (abaco)[cite: 1]
+        │   └── layout.ts         # Controlador que guarda las coordenadas de las mesas en la base de datos
+        ├── services/
+        │   └── fal.service.ts    # Lógica para generar imágenes estilizadas si no hay foto real[cite: 1]
+        └── webhooks/
+            └── n8n.webhook.ts    # Endpoint que envía la señal al orquestador visual (n8n)[cite: 1]
