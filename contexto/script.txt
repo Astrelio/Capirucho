@@ -1,0 +1,124 @@
+-- ==========================================
+-- 1. TABLAS PRINCIPALES (ESQUEMA PÚBLICO)
+-- ==========================================
+
+-- TABLA: restaurant
+CREATE TABLE "restaurant" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "name" TEXT NOT NULL,
+  "slug" TEXT UNIQUE NOT NULL,
+  "details" TEXT,
+  "address" TEXT,
+  "phone" TEXT,
+  "logoUrl" TEXT,
+  "coverUrl" TEXT,
+  "layoutMap" JSONB DEFAULT '{}',
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: profile
+CREATE TABLE "profile" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "authId" UUID UNIQUE NOT NULL, 
+  "fullName" TEXT,
+  "avatarUrl" TEXT,
+  "phone" TEXT,
+  "role" TEXT DEFAULT 'customer',
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE,
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: zone
+CREATE TABLE "zone" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "name" TEXT NOT NULL,
+  "color" TEXT DEFAULT '#555555',
+  "posX" FLOAT DEFAULT 0,
+  "posY" FLOAT DEFAULT 0,
+  "width" FLOAT DEFAULT 400,
+  "height" FLOAT DEFAULT 300,
+  "listOrder" INT DEFAULT 0,
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: dineTable
+CREATE TABLE "dineTable" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "zoneId" UUID REFERENCES "zone"("id") ON DELETE CASCADE NOT NULL,
+  "label" TEXT NOT NULL,
+  "seats" INT NOT NULL DEFAULT 4,
+  "shape" TEXT DEFAULT 'square',
+  "posX" FLOAT DEFAULT 0,
+  "posY" FLOAT DEFAULT 0,
+  "width" FLOAT DEFAULT 80,
+  "height" FLOAT DEFAULT 80,
+  "status" TEXT DEFAULT 'available',
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: booking
+CREATE TABLE "booking" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "tableId" UUID REFERENCES "dineTable"("id") ON DELETE SET NULL,
+  "authId" UUID,
+  "guest" TEXT NOT NULL,
+  "email" TEXT,
+  "phone" TEXT,
+  "bookDate" DATE NOT NULL,
+  "timeStart" TIME NOT NULL,
+  "timeEnd" TIME NOT NULL,
+  "partySize" INT NOT NULL DEFAULT 2,
+  "status" TEXT DEFAULT 'pending',
+  "notes" TEXT,
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: waitlist
+CREATE TABLE "waitlist" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "guest" TEXT NOT NULL,
+  "phone" TEXT,
+  "email" TEXT,
+  "partySize" INT NOT NULL DEFAULT 2,
+  "status" TEXT DEFAULT 'waiting',
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: menuCat
+CREATE TABLE "menuCat" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "name" TEXT NOT NULL,
+  "listOrder" INT DEFAULT 0
+);
+
+-- TABLA: menuItem
+CREATE TABLE "menuItem" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "catId" UUID REFERENCES "menuCat"("id") ON DELETE SET NULL,
+  "name" TEXT NOT NULL,
+  "details" TEXT,
+  "price" DECIMAL(10,2) NOT NULL,
+  "imgUrl" TEXT,
+  "isAi" BOOLEAN DEFAULT false,
+  "isActive" BOOLEAN DEFAULT true,
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
+-- TABLA: review
+CREATE TABLE "review" (
+  "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  "restId" UUID REFERENCES "restaurant"("id") ON DELETE CASCADE NOT NULL,
+  "authId" UUID,
+  "guest" TEXT,
+  "rating" INT NOT NULL CHECK ("rating" >= 1 AND "rating" <= 5),
+  "comment" TEXT,
+  "sentiment" TEXT,
+  "aiSummary" TEXT,
+  "createdAt" TIMESTAMPTZ DEFAULT now()
+);
