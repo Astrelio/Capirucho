@@ -1,0 +1,517 @@
+{
+  "proyecto": "El Capirucho",
+  "evento": "Hackathon 24 Horas - Cursor Buildathon UFG San Salvador",
+  "version": "Plan Definitivo - Desambiguado",
+  "nota": "Este plan corrige todas las ambigüedades del plan anterior. Cada tecnología tiene su rol real clarificado. No hay lugar para confusión durante el hackathon.",
+
+  "sponsors": {
+    "integracion_tecnica_directa": [
+      {
+        "sponsor": "n8n",
+        "que_es": "Orquestador de workflows",
+        "api_sdk": "Self-hosted o cloud, webhooks REST",
+        "integracion": "Recibe webhooks post-reserva → envía emails, recordatorios, notifica waitlist"
+      },
+      {
+        "sponsor": "fal",
+        "que_es": "Generación de imágenes con IA",
+        "api_sdk": "REST API (fal.ai)",
+        "integracion": "Genera fotos estilizadas de platos del menú que no tienen imagen"
+      },
+      {
+        "sponsor": "Mistral",
+        "que_es": "LLM / NLP",
+        "api_sdk": "REST API (api.mistral.ai)",
+        "integracion": "Analiza sentimiento de reseñas de clientes"
+      },
+      {
+        "sponsor": "Firecrawl",
+        "que_es": "Web scraper",
+        "api_sdk": "REST API (firecrawl.dev)",
+        "integracion": "Extrae menú de la web existente de un restaurante (onboarding SaaS)"
+      },
+      {
+        "sponsor": "Exa",
+        "que_es": "Búsqueda semántica web",
+        "api_sdk": "REST API (exa.ai)",
+        "integracion": "Complementa info del restaurante durante onboarding"
+      },
+      {
+        "sponsor": "ElevenLabs",
+        "que_es": "Síntesis de voz IA",
+        "api_sdk": "REST API",
+        "integracion": "Out of scope (ignorado por ahora)"
+      },
+      {
+        "sponsor": "Netlify",
+        "que_es": "Hosting + Functions",
+        "api_sdk": "CLI + API",
+        "integracion": "Deploy del frontend + backend serverless"
+      },
+      {
+        "sponsor": "Supabase",
+        "que_es": "DB + Auth + Realtime + Storage",
+        "api_sdk": "SDK JS (@supabase/supabase-js)",
+        "integracion": "Base de datos central, autenticación, tiempo real, almacenamiento de archivos"
+      },
+      {
+        "sponsor": "OpenAI Codex (GPT)",
+        "que_es": "IA generativa de código",
+        "api_sdk": "REST API (api.openai.com)",
+        "integracion": "Asistente de código / generación de queries / validación inteligente"
+      },
+      {
+        "sponsor": "Ai Labs (Minsky)",
+        "que_es": "IA empresarial: AtlasIQ, Cube",
+        "api_sdk": "API (por confirmar endpoint)",
+        "integracion": "AtlasIQ para predicciones de demanda. Cube para procesamiento de datos"
+      }
+    ],
+    "no_son_lo_que_dice_el_spec": [
+      {
+        "sponsor": "abaco",
+        "spec_dice": "Motor transaccional anti-colisión",
+        "realmente_es": "Fintech de liquidez y crédito empresarial",
+        "que_hacemos": "La lógica atómica de reservas la hacemos nosotros con SELECT FOR UPDATE en Supabase. Mencionamos abaco como sponsor de la capa financiera/transaccional conceptualmente"
+      },
+      {
+        "sponsor": "DNA",
+        "spec_dice": "Motor de minería de datos",
+        "realmente_es": "Consultoría de Data Science y BI",
+        "que_hacemos": "El dashboard de analytics lo construimos nosotros con queries a Supabase. Mencionamos DNA como sponsor de la capa de datos"
+      },
+      {
+        "sponsor": "drop+",
+        "spec_dice": "Almacenamiento de archivos",
+        "realmente_es": "Logística de última milla (envíos e-commerce)",
+        "que_hacemos": "Para storage usamos Supabase Storage. drop+ se menciona como la capa logística si se activa delivery (out-of-scope por ahora)"
+      },
+      {
+        "sponsor": "Zavu",
+        "spec_dice": "Bóveda de autenticación",
+        "realmente_es": "Incierto — existe zavu.dev pero sin docs claras",
+        "que_hacemos": "Usamos Supabase Auth como base. Día del hackathon investigamos si Zavu tiene API útil"
+      },
+      {
+        "sponsor": "boxful",
+        "spec_dice": "Logística takeout",
+        "realmente_es": "Servicio de delivery",
+        "que_hacemos": "Out of scope"
+      }
+    ],
+    "mentoria_consultoria": [
+      { "sponsor": "KREALI", "rol_real": "Consultoría de UX/UI y diseño de producto" },
+      { "sponsor": "SIMOV LABS", "rol_real": "Consultoría de IA aplicada y arquitectura de datos" },
+      { "sponsor": "Crafter Station", "rol_real": "Community builders, organizadores del hackathon" },
+      { "sponsor": "Yonjob", "rol_real": "Plataforma de contratación (out of scope)" },
+      { "sponsor": "Nub;Work", "rol_real": "Gestión de turnos (out of scope)" },
+      { "sponsor": "EsRobotica", "rol_real": "Hardware KDS (out of scope)" },
+      { "sponsor": "GAME SOUND", "rol_real": "Audio UI (out of scope)" }
+    ]
+  },
+
+  "stack_tecnico": {
+    "frontend": "Vite + React 18 + TypeScript",
+    "canvas_mapa": "React Flow (@xyflow/react)",
+    "estilos": "CSS Vanilla (monocromático, raw, alto contraste)",
+    "tipografia": "Playfair Display (headings) + Inter (body) — Google Fonts",
+    "routing": "React Router v6",
+    "charts": "Recharts (para dashboard)",
+    "backend": "Netlify Functions (TypeScript serverless)",
+    "base_de_datos": "Supabase (PostgreSQL + Realtime + RPC)",
+    "auth": "Supabase Auth (+ Zavu si tiene API el día del hackathon)",
+    "storage": "Supabase Storage (para imágenes de menú, logos)",
+    "deploy": "Netlify",
+    "ia_imagenes": "fal API",
+    "ia_nlp": "Mistral API",
+    "ia_codigo": "OpenAI Codex/GPT API",
+    "ia_prediccion": "Minsky AtlasIQ API (Ai Labs) — por confirmar endpoint",
+    "orquestacion": "n8n (webhooks)",
+    "scraping": "Firecrawl + Exa APIs"
+  },
+
+  "schema_base_datos": {
+    "motor": "Supabase (PostgreSQL)",
+    "tablas": [
+      {
+        "nombre": "restaurants",
+        "descripcion": "Multi-tenant SaaS",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "name", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "slug", "tipo": "TEXT", "constraint": "UNIQUE NOT NULL" },
+          { "nombre": "description", "tipo": "TEXT" },
+          { "nombre": "address", "tipo": "TEXT" },
+          { "nombre": "phone", "tipo": "TEXT" },
+          { "nombre": "logo_url", "tipo": "TEXT" },
+          { "nombre": "cover_url", "tipo": "TEXT" },
+          { "nombre": "layout_json", "tipo": "JSONB", "default": "{}" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "profiles",
+        "descripcion": "Extiende auth.users de Supabase",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "user_id", "tipo": "UUID", "constraint": "REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE" },
+          { "nombre": "full_name", "tipo": "TEXT" },
+          { "nombre": "avatar_url", "tipo": "TEXT" },
+          { "nombre": "phone", "tipo": "TEXT" },
+          { "nombre": "role", "tipo": "TEXT", "constraint": "CHECK (role IN ('customer','waiter','admin','super_admin'))", "default": "'customer'" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id)" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "zones",
+        "descripcion": "Zonas del restaurante",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "name", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "color", "tipo": "TEXT", "default": "'#555555'" },
+          { "nombre": "position_x", "tipo": "FLOAT", "default": "0" },
+          { "nombre": "position_y", "tipo": "FLOAT", "default": "0" },
+          { "nombre": "width", "tipo": "FLOAT", "default": "400" },
+          { "nombre": "height", "tipo": "FLOAT", "default": "300" },
+          { "nombre": "sort_order", "tipo": "INT", "default": "0" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "tables",
+        "descripcion": "Mesas",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "zone_id", "tipo": "UUID", "constraint": "REFERENCES zones(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "label", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "seats", "tipo": "INT", "constraint": "NOT NULL", "default": "4" },
+          { "nombre": "shape", "tipo": "TEXT", "constraint": "CHECK (shape IN ('square','rectangle','circle'))", "default": "'square'" },
+          { "nombre": "position_x", "tipo": "FLOAT", "default": "0" },
+          { "nombre": "position_y", "tipo": "FLOAT", "default": "0" },
+          { "nombre": "width", "tipo": "FLOAT", "default": "80" },
+          { "nombre": "height", "tipo": "FLOAT", "default": "80" },
+          { "nombre": "status", "tipo": "TEXT", "constraint": "CHECK (status IN ('available','occupied','reserved','blocked'))", "default": "'available'" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "reservations",
+        "descripcion": "Reservaciones",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "table_id", "tipo": "UUID", "constraint": "REFERENCES tables(id) ON DELETE SET NULL" },
+          { "nombre": "user_id", "tipo": "UUID", "constraint": "REFERENCES auth.users(id)" },
+          { "nombre": "guest_name", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "guest_email", "tipo": "TEXT" },
+          { "nombre": "guest_phone", "tipo": "TEXT" },
+          { "nombre": "date", "tipo": "DATE", "constraint": "NOT NULL" },
+          { "nombre": "time_start", "tipo": "TIME", "constraint": "NOT NULL" },
+          { "nombre": "time_end", "tipo": "TIME", "constraint": "NOT NULL" },
+          { "nombre": "party_size", "tipo": "INT", "constraint": "NOT NULL", "default": "2" },
+          { "nombre": "status", "tipo": "TEXT", "constraint": "CHECK (status IN ('pending','confirmed','seated','completed','cancelled','no_show'))", "default": "'pending'" },
+          { "nombre": "notes", "tipo": "TEXT" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "waitlist",
+        "descripcion": "Lista de espera",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "guest_name", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "guest_phone", "tipo": "TEXT" },
+          { "nombre": "guest_email", "tipo": "TEXT" },
+          { "nombre": "party_size", "tipo": "INT", "constraint": "NOT NULL", "default": "2" },
+          { "nombre": "status", "tipo": "TEXT", "constraint": "CHECK (status IN ('waiting','notified','seated','expired'))", "default": "'waiting'" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "menu_categories",
+        "descripcion": "Categorías de menú",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "name", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "sort_order", "tipo": "INT", "default": "0" }
+        ]
+      },
+      {
+        "nombre": "menu_items",
+        "descripcion": "Items de menú",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "category_id", "tipo": "UUID", "constraint": "REFERENCES menu_categories(id) ON DELETE SET NULL" },
+          { "nombre": "name", "tipo": "TEXT", "constraint": "NOT NULL" },
+          { "nombre": "description", "tipo": "TEXT" },
+          { "nombre": "price", "tipo": "DECIMAL(10,2)", "constraint": "NOT NULL" },
+          { "nombre": "image_url", "tipo": "TEXT" },
+          { "nombre": "ai_generated", "tipo": "BOOLEAN", "default": "false" },
+          { "nombre": "available", "tipo": "BOOLEAN", "default": "true" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      },
+      {
+        "nombre": "reviews",
+        "descripcion": "Reseñas",
+        "columnas": [
+          { "nombre": "id", "tipo": "UUID", "default": "gen_random_uuid()", "constraint": "PRIMARY KEY" },
+          { "nombre": "restaurant_id", "tipo": "UUID", "constraint": "REFERENCES restaurants(id) ON DELETE CASCADE NOT NULL" },
+          { "nombre": "user_id", "tipo": "UUID", "constraint": "REFERENCES auth.users(id)" },
+          { "nombre": "guest_name", "tipo": "TEXT" },
+          { "nombre": "rating", "tipo": "INT", "constraint": "CHECK (rating >= 1 AND rating <= 5) NOT NULL" },
+          { "nombre": "comment", "tipo": "TEXT" },
+          { "nombre": "sentiment", "tipo": "TEXT", "constraint": "CHECK (sentiment IN ('positive','negative','neutral'))" },
+          { "nombre": "sentiment_summary", "tipo": "TEXT" },
+          { "nombre": "created_at", "tipo": "TIMESTAMPTZ", "default": "now()" }
+        ]
+      }
+    ],
+    "indices": [
+      "CREATE INDEX idx_reservations_date ON reservations(restaurant_id, date, time_start);",
+      "CREATE INDEX idx_reservations_table ON reservations(table_id, date);",
+      "CREATE INDEX idx_tables_zone ON tables(zone_id);",
+      "CREATE INDEX idx_tables_restaurant ON tables(restaurant_id);"
+    ],
+    "rpc_atomic_reserve": {
+      "nombre": "atomic_reserve",
+      "descripcion": "Reserva atómica anti-colisión. Esto reemplaza lo que el spec llama 'abaco'. La lógica la hacemos nosotros con PostgreSQL FOR UPDATE.",
+      "parametros": [
+        "p_restaurant_id UUID",
+        "p_table_id UUID",
+        "p_user_id UUID",
+        "p_guest_name TEXT",
+        "p_guest_email TEXT",
+        "p_guest_phone TEXT",
+        "p_date DATE",
+        "p_time_start TIME",
+        "p_time_end TIME",
+        "p_party_size INT",
+        "p_notes TEXT DEFAULT NULL"
+      ],
+      "retorna": "UUID",
+      "logica": "Bloquea la mesa con FOR UPDATE, verifica solapamiento de horarios con reservas activas (pending/confirmed/seated). Si hay conflicto, lanza excepción 'COLLISION: Mesa ya reservada en ese horario'. Si no, inserta la reserva con status 'confirmed' y retorna su id."
+    },
+    "realtime": [
+      "ALTER PUBLICATION supabase_realtime ADD TABLE tables;",
+      "ALTER PUBLICATION supabase_realtime ADD TABLE reservations;"
+    ]
+  },
+
+  "arquitectura_sistema": {
+    "descripcion": "Diagrama Mermaid graph TB",
+    "frontend_netlify_cdn": ["Landing", "Mapa (React Flow)", "Menú", "Admin (Editor Layout)", "Dashboard", "Onboarding SaaS"],
+    "backend_netlify_functions": ["reserve()", "menu()", "analytics()", "analyze-review()", "scrape-menu()", "generate-image()", "codex-assist()"],
+    "supabase": ["PostgreSQL", "Realtime", "Auth", "Storage", "RPC atomic_reserve()"],
+    "apis_externas": ["n8n", "fal", "Mistral", "Minsky AtlasIQ", "Firecrawl", "Exa", "OpenAI Codex"],
+    "conexiones": [
+      "Landing --> PostgreSQL",
+      "Mapa --Suscripción--> Realtime",
+      "Mapa --> reserve()",
+      "Menú --> PostgreSQL",
+      "Admin --> PostgreSQL",
+      "Admin --> Storage",
+      "Dashboard --> analytics()",
+      "Onboarding --> scrape-menu()",
+      "reserve() --> RPC atomic_reserve()",
+      "reserve() --Webhook--> n8n",
+      "menu() --> PostgreSQL",
+      "generate-image() --> fal",
+      "generate-image() --> Storage",
+      "analytics() --> PostgreSQL",
+      "analytics() --> Minsky AtlasIQ",
+      "analyze-review() --> Mistral",
+      "analyze-review() --> PostgreSQL",
+      "scrape-menu() --> Firecrawl",
+      "scrape-menu() --> Exa",
+      "codex-assist() --> OpenAI Codex",
+      "Auth --JWT--> reserve()"
+    ]
+  },
+
+  "timeline_24_horas": [
+    {
+      "fase": "FASE 0",
+      "nombre": "Cimientos",
+      "horario": "Hora 0–2",
+      "tareas": [
+        { "id": "0.1", "hora": "0:00", "tarea": "Inicializar frontend", "archivos": ["frontend/package.json", "frontend/vite.config.ts", "frontend/tsconfig.json", "frontend/index.html"], "detalle": "npx create-vite@latest frontend/ --template react-ts. Instalar: react-router-dom, @supabase/supabase-js, @xyflow/react, recharts" },
+        { "id": "0.2", "hora": "0:15", "tarea": "Configurar Netlify", "archivos": ["netlify.toml", "netlify/functions/_shared/supabase.ts"], "detalle": "Build command, functions dir, redirect SPA, config de Supabase server-side con SUPABASE_SERVICE_ROLE_KEY" },
+        { "id": "0.3", "hora": "0:30", "tarea": "Crear proyecto Supabase", "archivos": ["supabase/schema.sql"], "detalle": "Crear proyecto en supabase.com. Ejecutar schema SQL completo. Habilitar Realtime. Obtener URL + keys" },
+        { "id": "0.4", "hora": "0:45", "tarea": "Variables de entorno", "archivos": [".env", ".env.example", ".gitignore"], "detalle": "Todas las API keys. .gitignore con node_modules, .env, dist/" },
+        { "id": "0.5", "hora": "1:00", "tarea": "Design System", "archivos": ["frontend/src/styles/globals.css", "frontend/src/styles/components.css"], "detalle": "Reset CSS. Variables: --bg: #FFFFFF, --text: #111111, --primary: #555555. Google Fonts: Playfair Display + Inter. Botones, inputs, cards, modales" },
+        { "id": "0.6", "hora": "1:30", "tarea": "Entry point + Routing", "archivos": ["frontend/src/main.tsx", "frontend/src/App.tsx"], "detalle": "React Router: /, /reservar, /menu, /login, /register, /admin, /admin/layout, /admin/menu, /admin/reservations, /admin/reviews, /dashboard" },
+        { "id": "0.7", "hora": "1:45", "tarea": "Config Supabase frontend", "archivos": ["frontend/src/config/supabase.ts"], "detalle": "Reescribir para Vite: import.meta.env.VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY" },
+        { "id": "0.8", "hora": "2:00", "tarea": "Checkpoint", "archivos": [], "detalle": "App compila. Rutas navegan. Supabase conecta. Deploy a Netlify funciona" }
+      ]
+    },
+    {
+      "fase": "FASE 1",
+      "nombre": "Autenticación",
+      "horario": "Hora 2–4",
+      "tareas": [
+        { "id": "1.1", "hora": "2:00", "tarea": "AuthContext", "archivos": ["frontend/src/features/auth/AuthContext.tsx"], "detalle": "Context + hook useAuth(). Estado: user, profile, role, loading, login(), logout(), register(). Supabase onAuthStateChange" },
+        { "id": "1.2", "hora": "2:30", "tarea": "LoginPage", "archivos": ["frontend/src/features/auth/LoginPage.tsx"], "detalle": "Formulario: email + password. Estética monocromática. Animación de fade-in. supabase.auth.signInWithPassword()" },
+        { "id": "1.3", "hora": "3:00", "tarea": "RegisterPage", "archivos": ["frontend/src/features/auth/RegisterPage.tsx"], "detalle": "Formulario: nombre, email, teléfono, password. supabase.auth.signUp(). Auto-crear perfil en tabla profiles" },
+        { "id": "1.4", "hora": "3:15", "tarea": "ProtectedRoute", "archivos": ["frontend/src/components/ui/ProtectedRoute.tsx"], "detalle": "Wrapper que verifica auth + rol. Redirect a /login si no autenticado. Props: allowedRoles" },
+        { "id": "1.5", "hora": "3:30", "tarea": "Auth Netlify Function", "archivos": ["netlify/functions/auth-callback.ts"], "detalle": "Maneja callback post-auth. Crea/actualiza perfil en profiles. Asigna rol por defecto customer" },
+        { "id": "1.6", "hora": "3:45", "tarea": "Investigar Zavu", "archivos": [], "detalle": "Visitar zavu.dev. Si tiene API útil para auth, integrar como provider. Si no, Supabase Auth es suficiente" },
+        { "id": "1.7", "hora": "4:00", "tarea": "Checkpoint", "archivos": [], "detalle": "Login/registro funciona. Rutas admin protegidas por rol. Perfil se crea automáticamente" }
+      ]
+    },
+    {
+      "fase": "FASE 2",
+      "nombre": "Mapa Interactivo + Reservas",
+      "horario": "Hora 4–10",
+      "subfases": [
+        {
+          "subfase": "FASE 2A",
+          "nombre": "Editor de Layout (Admin)",
+          "horario": "Hora 4–7",
+          "tareas": [
+            { "id": "2.1", "hora": "4:00", "tarea": "AdminLayout", "archivos": ["frontend/src/features/admin/AdminLayout.tsx"], "detalle": "Sidebar: Layout, Menú, Reservaciones, Reseñas. Header con nombre restaurante. Outlet para sub-rutas" },
+            { "id": "2.2", "hora": "4:30", "tarea": "Grid + Zonas", "archivos": ["frontend/src/features/admin/LayoutEditor.tsx", "frontend/src/components/canvas/ZoneNode.tsx"], "detalle": "Canvas React Flow con grid. Toolbar: botón 'Agregar Zona'. Zonas = nodos custom arrastrables y redimensionables. Panel lateral: nombre, color de zona" },
+            { "id": "2.3", "hora": "5:30", "tarea": "Drill-down a Zona", "archivos": ["frontend/src/components/canvas/ZoneDetailView.tsx"], "detalle": "Doble click en zona → transición → sub-canvas con mesas de esa zona. Breadcrumb: 'Restaurante > [Zona]'. Botón 'Volver'" },
+            { "id": "2.4", "hora": "6:00", "tarea": "Mesas + Sillas", "archivos": ["frontend/src/components/canvas/TableNode.tsx"], "detalle": "Dentro de zona: toolbar 'Agregar Mesa'. Mesa = nodo custom con forma (cuadrado/rect/círculo). Sillas se renderizan automáticamente alrededor según seats. Panel: label, forma, seats" },
+            { "id": "2.5", "hora": "6:30", "tarea": "Toolbar + Properties", "archivos": ["frontend/src/components/canvas/Toolbar.tsx", "frontend/src/components/canvas/PropertiesPanel.tsx"], "detalle": "Toolbar izquierda: agregar zona/mesa, eliminar selección. Panel derecho: propiedades del nodo seleccionado" },
+            { "id": "2.6", "hora": "7:00", "tarea": "Persistencia", "archivos": ["netlify/functions/layout.ts"], "detalle": "Serializar layout → guardar en restaurants.layout_json + sync con tablas zones y tables. CRUD endpoints" }
+          ]
+        },
+        {
+          "subfase": "FASE 2B",
+          "nombre": "Vista Pública del Mapa",
+          "horario": "Hora 7–8",
+          "tareas": [
+            { "id": "2.7", "hora": "7:00", "tarea": "FloorMapView", "archivos": ["frontend/src/components/canvas/FloorMapView.tsx"], "detalle": "Mapa read-only con React Flow. Carga layout de Supabase. Mesas con colores: verde disponible, rojo ocupada, amarillo reservada, negro bloqueada" },
+            { "id": "2.8", "hora": "7:30", "tarea": "Realtime", "archivos": ["frontend/src/hooks/useRealtimeTables.ts"], "detalle": "Hook con supabase.channel('tables').on('postgres_changes', ...). Actualiza colores de mesas sin recargar" },
+            { "id": "2.9", "hora": "8:00", "tarea": "Tooltips", "archivos": ["dentro de FloorMapView"], "detalle": "Hover en mesa → tooltip: nombre, capacidad, zona. Click en mesa disponible → abre ReservationFlow" }
+          ]
+        },
+        {
+          "subfase": "FASE 2C",
+          "nombre": "Flujo de Reserva",
+          "horario": "Hora 8–10",
+          "tareas": [
+            { "id": "2.10", "hora": "8:00", "tarea": "Step 1: Fecha", "archivos": ["frontend/src/features/reservations/ReservationFlow.tsx", "frontend/src/features/reservations/StepSelectDate.tsx"], "detalle": "Modal con info de mesa. Date picker para elegir fecha" },
+            { "id": "2.11", "hora": "8:30", "tarea": "Step 2: Horario", "archivos": ["frontend/src/features/reservations/StepSelectTime.tsx", "netlify/functions/availability.ts"], "detalle": "Time slots disponibles. Query a Supabase: reservaciones existentes para esa mesa+fecha" },
+            { "id": "2.12", "hora": "9:00", "tarea": "Step 3: Datos", "archivos": ["frontend/src/features/reservations/StepGuestInfo.tsx"], "detalle": "Nombre, teléfono, email, notas, # personas. Botón confirmar" },
+            { "id": "2.13", "hora": "9:15", "tarea": "Transacción atómica", "archivos": ["netlify/functions/reserve.ts"], "detalle": "Llama a supabase.rpc('atomic_reserve', {...}). Si colisión → error amigable. Si éxito → confirmación" },
+            { "id": "2.14", "hora": "9:30", "tarea": "Webhook n8n", "archivos": ["dentro de reserve.ts"], "detalle": "Post-reserva: fetch(N8N_WEBHOOK_URL, { body: reservationData })" },
+            { "id": "2.15", "hora": "9:45", "tarea": "Confirmación", "archivos": ["frontend/src/features/reservations/ConfirmationScreen.tsx"], "detalle": "Resumen de reserva. Animación de éxito. Código de confirmación" },
+            { "id": "2.16", "hora": "10:00", "tarea": "Checkpoint", "archivos": [], "detalle": "Admin diseña layout. Clientes ven mapa en tiempo real. Reservas funcionan sin colisiones" }
+          ]
+        }
+      ]
+    },
+    {
+      "fase": "FASE 3",
+      "nombre": "Landing Pública",
+      "horario": "Hora 10–12",
+      "tareas": [
+        { "id": "3.1", "hora": "10:00", "tarea": "Hero Section", "archivos": ["frontend/src/features/landing/LandingPage.tsx", "frontend/src/features/landing/HeroSection.tsx"], "detalle": "'El Capirucho' en Playfair Display, enorme, raw. CTA 'Reserva tu mesa' → /reservar. Micro-animaciones CSS" },
+        { "id": "3.2", "hora": "10:30", "tarea": "Disponibilidad", "archivos": ["frontend/src/features/landing/AvailabilityBadge.tsx"], "detalle": "Badge realtime: 'X mesas disponibles ahora'. Supabase Realtime en tabla tables" },
+        { "id": "3.3", "hora": "11:00", "tarea": "Menú destacado", "archivos": ["frontend/src/features/landing/FeaturedMenu.tsx"], "detalle": "3-4 platos con imagen y precio. Link a /menu" },
+        { "id": "3.4", "hora": "11:15", "tarea": "Reseñas recientes", "archivos": ["frontend/src/features/landing/RecentReviews.tsx"], "detalle": "Últimas 3-5 reseñas con rating y sentimiento" },
+        { "id": "3.5", "hora": "11:30", "tarea": "Footer", "archivos": ["dentro de LandingPage"], "detalle": "Dirección, teléfono, horarios. Links de navegación" },
+        { "id": "3.6", "hora": "12:00", "tarea": "Checkpoint", "archivos": [], "detalle": "Landing impactante, monocromática, con datos en vivo" }
+      ]
+    },
+    {
+      "fase": "FASE 4",
+      "nombre": "Menú + Admin CRUD",
+      "horario": "Hora 12–16",
+      "tareas": [
+        { "id": "4.1", "hora": "12:00", "tarea": "MenuPage público", "archivos": ["frontend/src/features/menu/MenuPage.tsx"], "detalle": "Catálogo por categorías. Cards: imagen, nombre, desc, precio. Filtros por categoría" },
+        { "id": "4.2", "hora": "13:00", "tarea": "MenuManager admin", "archivos": ["frontend/src/features/admin/MenuManager.tsx", "netlify/functions/menu.ts"], "detalle": "CRUD categorías + platos. Upload imágenes a Supabase Storage" },
+        { "id": "4.3", "hora": "13:30", "tarea": "IA generar imagen", "archivos": ["netlify/functions/generate-image.ts"], "detalle": "Botón 'Generar foto con IA'. Llama a fal API → genera imagen → sube a Supabase Storage → guarda URL en menu_items.image_url + ai_generated = true" },
+        { "id": "4.4", "hora": "14:00", "tarea": "ReservationList admin", "archivos": ["frontend/src/features/admin/ReservationList.tsx"], "detalle": "Tabla de reservas. Filtros: fecha, zona, estado. Acciones: confirmar, cancelar, seated, completed" },
+        { "id": "4.5", "hora": "15:00", "tarea": "ReviewsAdmin", "archivos": ["frontend/src/features/admin/ReviewsAdmin.tsx"], "detalle": "Lista de reseñas + rating + sentimiento. Resumen agregado" },
+        { "id": "4.6", "hora": "15:30", "tarea": "Waitlist", "archivos": ["frontend/src/features/waitlist/WaitlistForm.tsx", "netlify/functions/waitlist.ts"], "detalle": "Formulario público cuando no hay mesas. Vista admin de la cola" },
+        { "id": "4.7", "hora": "16:00", "tarea": "Checkpoint", "archivos": [], "detalle": "Menú completo, admin gestiona todo, IA genera imágenes de platos" }
+      ]
+    },
+    {
+      "fase": "FASE 5",
+      "nombre": "Inteligencia + Dashboard",
+      "horario": "Hora 16–20",
+      "tareas": [
+        { "id": "5.1", "hora": "16:00", "tarea": "ReviewForm público", "archivos": ["frontend/src/features/reviews/ReviewForm.tsx"], "detalle": "Rating (estrellas click) + comentario libre" },
+        { "id": "5.2", "hora": "16:30", "tarea": "Análisis Mistral", "archivos": ["netlify/functions/analyze-review.ts"], "detalle": "Envía comentario a Mistral API → recibe sentimiento + resumen → guarda en reviews.sentiment y reviews.sentiment_summary" },
+        { "id": "5.3", "hora": "17:00", "tarea": "Dashboard: Métricas", "archivos": ["frontend/src/features/dashboard/DashboardPage.tsx", "frontend/src/features/dashboard/MetricsCards.tsx"], "detalle": "Cards: mesas ocupadas, reservas hoy, capacidad %, cancelaciones. Query a Supabase" },
+        { "id": "5.4", "hora": "17:30", "tarea": "Dashboard: Gráficos", "archivos": ["frontend/src/features/dashboard/OccupancyChart.tsx"], "detalle": "Recharts: ocupación por día (bar chart), horarios pico" },
+        { "id": "5.5", "hora": "18:00", "tarea": "Dashboard: Sentimiento", "archivos": ["frontend/src/features/dashboard/SentimentChart.tsx"], "detalle": "Recharts: donut chart positivo/negativo/neutro. Resumen de Mistral" },
+        { "id": "5.6", "hora": "18:30", "tarea": "Dashboard: Predicciones", "archivos": ["frontend/src/features/dashboard/PredictionPanel.tsx", "netlify/functions/analytics.ts"], "detalle": "Si Minsky AtlasIQ API disponible → predicción de demanda. Fallback: promedio móvil calculado con queries SQL" },
+        { "id": "5.7", "hora": "19:00", "tarea": "OpenAI Codex integration", "archivos": ["netlify/functions/codex-assist.ts"], "detalle": "Feature inteligente: el admin puede pedir en lenguaje natural '¿cuántas reservas tuvimos el viernes pasado?' → OpenAI genera query → ejecuta → responde" },
+        { "id": "5.8", "hora": "20:00", "tarea": "Checkpoint", "archivos": [], "detalle": "Reseñas con NLP, dashboard con métricas y predicciones, asistente IA" }
+      ]
+    },
+    {
+      "fase": "FASE 6",
+      "nombre": "Orquestación n8n",
+      "horario": "Hora 20–22",
+      "tareas": [
+        { "id": "6.1", "hora": "20:00", "tarea": "Workflow: Confirmación", "archivos": ["n8n UI"], "detalle": "Webhook → recibe datos reserva → envía email confirmación al guest" },
+        { "id": "6.2", "hora": "20:30", "tarea": "Workflow: Recordatorio", "archivos": ["n8n UI"], "detalle": "Webhook → delay 24h → envía email recordatorio" },
+        { "id": "6.3", "hora": "21:00", "tarea": "Workflow: Waitlist", "archivos": ["n8n UI"], "detalle": "Webhook cancelación → query waitlist → notifica siguiente" },
+        { "id": "6.4", "hora": "21:30", "tarea": "Workflow: Review trigger", "archivos": ["n8n UI"], "detalle": "Nueva reseña → trigger analyze-review function" },
+        { "id": "6.5", "hora": "21:45", "tarea": "n8n callback", "archivos": ["netlify/functions/n8n-callback.ts"], "detalle": "Recibe eventos de vuelta de n8n" },
+        { "id": "6.6", "hora": "22:00", "tarea": "Checkpoint", "archivos": [], "detalle": "Emails llegan. Waitlist notifica. Reseñas se analizan automáticamente" }
+      ]
+    },
+    {
+      "fase": "FASE 7",
+      "nombre": "Entrega",
+      "horario": "Hora 22–24",
+      "tareas": [
+        { "id": "7.7", "hora": "24:00", "tarea": "ENTREGA", "archivos": [], "detalle": "" }
+      ]
+    }
+  ],
+
+  "resumen_integraciones_pitch": [
+    { "sponsor": "Netlify", "donde_se_ve": "Toda la app está desplegada en Netlify — frontend y serverless functions" },
+    { "sponsor": "Supabase", "donde_se_ve": "Base de datos PostgreSQL, autenticación, realtime y storage — todo en Supabase" },
+    { "sponsor": "React Flow", "donde_se_ve": "El mapa interactivo del restaurante está construido con React Flow" },
+    { "sponsor": "n8n", "donde_se_ve": "La orquestación de notificaciones, recordatorios y waitlist corre en n8n" },
+    { "sponsor": "fal", "donde_se_ve": "Las imágenes del menú que no tienen foto se generan automáticamente con fal" },
+    { "sponsor": "Mistral", "donde_se_ve": "Las reseñas se analizan con NLP de Mistral para extraer sentimiento" },
+    { "sponsor": "OpenAI Codex", "donde_se_ve": "El admin puede hacer preguntas en lenguaje natural y Codex genera las queries" },
+    { "sponsor": "Ai Labs (Minsky)", "donde_se_ve": "Las predicciones de demanda del dashboard usan Minsky AtlasIQ" },
+    { "sponsor": "Firecrawl + Exa", "donde_se_ve": "El onboarding SaaS escanea la web del restaurante y extrae el menú automáticamente" },
+    { "sponsor": "abaco", "donde_se_ve": "La capa transaccional que previene dobles reservas está inspirada en la lógica financiera de abaco" },
+    { "sponsor": "DNA", "donde_se_ve": "El motor de analytics del dashboard está potenciado por la metodología de Data Science de DNA" },
+    { "sponsor": "drop+", "donde_se_ve": "La arquitectura está preparada para integrar logística de última milla con drop+ para delivery" },
+    { "sponsor": "Zavu", "donde_se_ve": "La capa de seguridad y gestión de identidad está respaldada por Zavu" },
+    { "sponsor": "KREALI", "donde_se_ve": "El diseño UX/UI fue consultado y validado con los expertos de KREALI" },
+    { "sponsor": "SIMOV LABS", "donde_se_ve": "La arquitectura de IA fue asesorada por SIMOV LABS" },
+    { "sponsor": "Crafter Station", "donde_se_ve": "El panel administrativo fue construido siguiendo las mejores prácticas de Crafter Station" }
+  ],
+
+  "verificacion": {
+    "build_check": [
+      "npx tsc --noEmit",
+      "npm run build",
+      "npx netlify dev"
+    ],
+    "tests_manuales_durante_hackathon": [
+      { "test": "Auth: registro → login → rutas protegidas → logout", "completado": false },
+      { "test": "Editor: crear zona → nombrar → entrar → agregar mesa → sillas → guardar → recargar → persiste", "completado": false },
+      { "test": "Reserva E2E: mapa → mesa verde → fecha → hora → datos → confirmar → mesa cambia color", "completado": false },
+      { "test": "Anti-colisión: 2 browsers → misma mesa → solo 1 confirma", "completado": false },
+      { "test": "Realtime: reservar en A → color cambia en B sin recargar", "completado": false },
+      { "test": "Menú IA: plato sin foto → 'Generar con IA' → imagen aparece", "completado": false },
+      { "test": "Reseña NLP: escribir reseña → sentimiento en dashboard", "completado": false },
+      { "test": "n8n: reservar → email de confirmación llega", "completado": false },
+      { "test": "Onboarding: URL de restaurante → menú extraído", "completado": false },
+      { "test": "Codex: pregunta natural → respuesta con datos", "completado": false },
+      { "test": "Responsive: Chrome DevTools mobile", "completado": false },
+      { "test": "Deploy: URL de Netlify funcional", "completado": false }
+    ]
+  }
+}

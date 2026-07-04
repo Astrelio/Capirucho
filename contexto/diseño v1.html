@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>El Capirucho - Traditional Heritage, Modern Taste</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&amp;family=Work+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "outline-variant": "#ddc0ba",
+                "secondary-container": "#ff8e36",
+                "tertiary-fixed": "#bbf0b6",
+                "secondary-fixed": "#ffdcc7",
+                "surface": "#fef9f2",
+                "inverse-surface": "#32302c",
+                "secondary-fixed-dim": "#ffb787",
+                "error-container": "#ffdad6",
+                "background": "#fef9f2",
+                "primary-fixed-dim": "#ffb4a5",
+                "on-error": "#ffffff",
+                "surface-dim": "#ded9d3",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#f8f3ec",
+                "on-surface": "#1d1c18",
+                "tertiary": "#386739",
+                "on-secondary-fixed-variant": "#723600",
+                "on-primary-container": "#fffcff",
+                "on-primary-fixed-variant": "#822615",
+                "inverse-on-surface": "#f5f0e9",
+                "on-error-container": "#93000a",
+                "error": "#ba1a1a",
+                "surface-container-highest": "#e6e2db",
+                "surface-bright": "#fef9f2",
+                "on-tertiary-fixed-variant": "#215025",
+                "outline": "#8a716d",
+                "primary-fixed": "#ffdad3",
+                "surface-variant": "#e6e2db",
+                "surface-container": "#f2ede6",
+                "primary-container": "#c0533e",
+                "on-tertiary-container": "#fafff4",
+                "on-background": "#1d1c18",
+                "on-secondary": "#ffffff",
+                "tertiary-fixed-dim": "#9fd49c",
+                "on-tertiary-fixed": "#002105",
+                "surface-container-high": "#ece7e1",
+                "on-secondary-container": "#673000",
+                "secondary": "#964900",
+                "tertiary-container": "#508050",
+                "on-primary-fixed": "#3e0400",
+                "on-surface-variant": "#57423e",
+                "on-primary": "#ffffff",
+                "surface-tint": "#a23d2a",
+                "primary": "#a03b28",
+                "on-secondary-fixed": "#311300",
+                "on-tertiary": "#ffffff",
+                "inverse-primary": "#ffb4a5"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "section-gap": "80px",
+                "stack-lg": "32px",
+                "stack-sm": "8px",
+                "stack-md": "16px",
+                "margin-desktop": "40px",
+                "unit": "8px",
+                "container-max-width": "1200px",
+                "margin-mobile": "16px",
+                "gutter": "24px"
+        },
+        "fontFamily": {
+                "caption": [
+                        "Work Sans"
+                ],
+                "headline-lg": [
+                        "Merriweather"
+                ],
+                "label-md": [
+                        "Work Sans"
+                ],
+                "body-md": [
+                        "Work Sans"
+                ],
+                "body-lg": [
+                        "Work Sans"
+                ],
+                "display-lg": [
+                        "Merriweather"
+                ],
+                "headline-md": [
+                        "Merriweather"
+                ],
+                "display-lg-mobile": [
+                        "Merriweather"
+                ]
+        },
+        "fontSize": {
+                "caption": [
+                        "12px",
+                        {
+                                "lineHeight": "1.4",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "900"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "fontWeight": "900"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .glow-shadow {
+            box-shadow: 0 10px 25px -5px rgba(160, 59, 40, 0.15), 0 8px 10px -6px rgba(160, 59, 40, 0.1);
+        }
+        .rustic-border {
+            border: 1px solid theme('colors.outline');
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="w-full top-0 sticky bg-background/90 backdrop-blur-md z-50 transition-all duration-300 border-b rustic-border">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-stack-md max-w-container-max-width mx-auto">
+<div class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary uppercase tracking-tighter">
+                El Capirucho
+            </div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex gap-gutter items-center">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-300 font-label-md text-label-md tracking-widest active:scale-95 transition-transform uppercase" href="#story">Story</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-300 font-label-md text-label-md tracking-widest active:scale-95 transition-transform uppercase" href="#menu">Menu</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-300 font-label-md text-label-md tracking-widest active:scale-95 transition-transform uppercase" href="#reservations">Reserve</a>
+</nav>
+<div class="hidden md:block">
+<a class="bg-transparent border border-primary text-primary font-label-md text-label-md px-6 py-3 rounded-DEFAULT hover:bg-primary hover:text-on-primary transition-colors uppercase tracking-widest" href="#reservations">
+                    Book a Table
+                </a>
+</div>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-primary p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Hero Editorial Section -->
+<section class="relative w-full min-h-[90vh] flex flex-col md:flex-row items-center overflow-hidden bg-surface-container-low pt-section-gap pb-stack-lg px-margin-mobile md:px-margin-desktop">
+<div class="w-full md:w-1/2 flex flex-col justify-center z-10 md:pr-12 lg:pr-24 max-w-2xl mx-auto md:ml-auto md:mr-0 text-center md:text-left mb-stack-lg md:mb-0">
+<h1 class="font-display-lg-mobile md:text-[5rem] lg:text-[7rem] leading-none font-900 text-primary mb-stack-md">
+                Sabor que<br/><span class="text-outline">Tradición</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-lg md:max-w-none">
+                Experience the warmth of family recipes passed down through generations, crafted with modern culinary precision in the heart of the city.
+            </p>
+<a class="inline-block bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-none hover:bg-on-primary-fixed-variant transition-colors text-lg tracking-widest uppercase self-start mx-auto md:mx-0" href="#reservations">
+                Discover Our Heritage
+            </a>
+</div>
+<div class="w-full md:w-1/2 relative h-[50vh] md:h-[80vh] z-0">
+<img alt="Hero Dish" class="w-full h-full object-cover object-center rustic-border" data-alt="A spectacular, high-resolution, close-up photograph of a traditional, rustic Latin American dish sizzling in a cast-iron pan. The food is perfectly cooked, with rich textures of grilled meats, vibrant charred vegetables, and a glossy, rich sauce. The scene is illuminated by warm, directional lighting that highlights the steam rising gently, evoking a sense of hearth-cooked comfort. The background is slightly blurred with creamy, warm undertones to keep the focus on the vibrant terracotta and orange colors of the food. The aesthetic is modern, artisanal, and incredibly appetizing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAADo0thPmFSgo2cs-rbEedL_JSyQsz4bhcDURgMs6bJGFjRoLm6LWfF5wSI0aBet9DtfiWxMmj8JtSp-H5LCeyCDMGZe22VGf5XNdwgxBeYTVnu6G34ruVS4516it6yUcIy7SMTpnnp8mAxPXSgsv7-v4MaquOHnrj5y7-7GZK5r8cSujIKyzUjcIYjOBlycYpOb5sCR3_IPJ1dKAFkdqvG7AnUk4HBf1jfCQLJrOtGRvs4jpSAX7cwbq6plpoB7_rLi2s_xe_A8E"/>
+<div class="absolute -bottom-8 -left-8 md:bottom-12 md:-left-24 bg-surface p-stack-md rustic-border z-20 max-w-xs hidden md:block">
+<p class="font-headline-md text-headline-md text-on-surface mb-2 font-italic">"The essence of the hearth."</p>
+<span class="font-caption text-caption text-outline uppercase tracking-widest">Est. 2024</span>
+</div>
+</div>
+</section>
+<!-- Narrative Section 1 -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto" id="story">
+<div class="flex flex-col md:flex-row items-center gap-section-gap relative">
+<div class="w-full md:w-5/12 z-10 relative">
+<img alt="Our Kitchen" class="w-full h-[600px] object-cover rustic-border" data-alt="A warm, intimate photograph of a bustling, modern restaurant kitchen. A chef in a pristine white apron is carefully plating a colorful traditional dish. The lighting is golden and inviting, highlighting the fresh ingredients like vibrant green cilantro, deep red tomatoes, and rustic wooden cutting boards. The atmosphere feels authentic, artisanal, and focused on high-quality culinary craftsmanship. The color palette emphasizes warm terracotta tones, crisp whites, and natural wood textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZKIW3t6QXmqVWyERjYpXnzyAFolO63Wn8eAkKjroT5MrG18KPWVQCz6T7p70Kr1XHAtmp-0fTr1OQ_ssIuiYHDw0kKpo-x0X6Ddf0cciLpQ5PacM2N-LRcEGIs6mwKwFy-gxy7v0dJRTLDNKhrPydNx7ev6KkY4hFBlLXCpUXDC5MuX7JXrZQuCaGOIP25LCI9NcndPVTvXK1J-es4bax16SwM5fIN_cimjyMP-9yNuXqOewucW1ohk3vXEAN9YH9dwukDoqll6o"/>
+</div>
+<div class="w-full md:w-7/12 flex flex-col gap-stack-lg md:-ml-24 z-20 bg-surface p-stack-lg md:p-section-gap rustic-border">
+<h2 class="font-headline-lg-mobile md:text-[3.5rem] leading-tight text-primary font-900">Nuestra<br/>Historia</h2>
+<div class="w-16 h-1 bg-outline-variant mb-4"></div>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                    At El Capirucho, every dish tells a story. Born from a deep love for our cultural heritage, our kitchen is a tribute to the rustic, hearth-cooked meals of our ancestors. We believe in the power of simple, fresh ingredients transformed by time-honored techniques.
+                </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                    Our journey began with a single family recipe and a desire to share the authentic flavors of our home. Today, we blend that traditional soul with a modern aesthetic, creating a dining experience that is both comforting and sophisticated. Welcome to our table.
+                </p>
+</div>
+</div>
+</section>
+<!-- Narrative Section 2: Featured Dish -->
+<section class="py-section-gap bg-surface-container-highest relative overflow-hidden" id="menu">
+<div class="absolute top-0 right-0 w-1/3 h-full bg-surface-container-low hidden lg:block"></div>
+<div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex flex-col lg:flex-row gap-section-gap items-center relative z-10">
+<div class="w-full lg:w-1/2 flex flex-col gap-stack-md order-2 lg:order-1">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Especialidad de la Casa</span>
+<h2 class="font-headline-lg-mobile md:text-[3.5rem] leading-tight text-primary font-900">Costilla Estofada</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-md">
+                    Slow-braised beef ribs with rustic herbs, served over creamy maize purée. A masterclass in slow cooking, highlighting the rich, deep flavors of tradition.
+                </p>
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md text-on-surface">$28</span>
+<div class="h-[1px] flex-grow bg-outline-variant"></div>
+</div>
+</div>
+<div class="w-full lg:w-1/2 order-1 lg:order-2">
+<img alt="Costilla Estofada" class="w-full h-[500px] object-cover rustic-border" data-alt="A beautifully plated dish of tender braised beef short ribs resting on a bed of creamy, golden polenta. The dish is garnished with a vibrant chimichurri sauce and microgreens. The food is photographed from a dynamic 45-degree angle with a shallow depth of field, making the textures pop against a pristine white background. Warm, natural lighting highlights the rich, deep brown and terracotta tones of the meat, creating a luxurious and appetizing modern presentation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCyazzAfwBAjo0dJ4n0PYjjUD2FszQFsPvj-n9EqhGdOEaBYdShDIfbxA4IZ60WIH9qxkIC52r-02qt0r10GOCBIL6AjJLqMsRyZ1xdKGZb0XorxhtxotuEnwBiwBQ3cH_i5ikcp5u0kHDOqa_8w5rO4-wfvXq8H8HPBqNu5QV_7KSeEXjI0pjHrb1MV9Rk0OnRRGsZxE2etNqNijrhmojv9rAb2xP9QSXtbzjTUZSWvGm2E_63BvQ0ly83hDIgW8ZlI74b2S3orE"/>
+</div>
+</div>
+</section>
+<!-- More Dishes (Editorial Grid) -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-stack-lg">
+<h2 class="font-headline-lg-mobile md:text-[3rem] text-primary font-900 max-w-md">Delicias del Mar y la Tierra</h2>
+<a class="border-b border-primary text-primary font-label-md text-label-md pb-1 hover:text-outline transition-colors uppercase tracking-widest mt-4 md:mt-0 inline-block" href="#">
+                View Full Menu
+            </a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-section-gap">
+<!-- Dish 2 -->
+<div class="flex flex-col gap-stack-md group">
+<div class="h-[400px] overflow-hidden rustic-border">
+<img alt="Ceviche Tradicional" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="An elegant, modern presentation of a vibrant seafood ceviche served in a shallow, rustic ceramic bowl. The dish features fresh, translucent fish, bright orange sweet potato cubes, thinly sliced red onions, and large kernels of white corn. The lighting is bright and warm, casting soft shadows that emphasize the freshness of the ingredients. The background is a minimalist, creamy white surface, keeping the focus entirely on the colorful, high-contrast food. Shot at a 45-degree angle with a shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZbThG4zDsMoaM_MMPbcodtvGtvgzTVFiuxmPmzMtDCifM2ZrZQviI2Rd-Dsf5TO0Q196wHDkQzPEFhpb1o7gAT_e9KhS4p7D-s49hnDUmn34ifVbCFObzOSfnbDJY4dJeiwRNdsAeVB1JjvKvZ62wsBZbpvsqD5lMJpWxlHyJMpEPvfKZux1At2QBvRe1NxjlK9oNvEtPEx9cgls15TOZroY9BqVH4enK9ImRBIhCjIwvUZgoUYyU8sn94RAilZleTL7SXjM_4rM"/>
+</div>
+<div class="flex justify-between items-start mt-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Ceviche Tradicional</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Fresh catch of the day cured in citrus juices, spiced with aji pepper and sweet potato.</p>
+</div>
+<span class="font-headline-md text-headline-md text-outline">$22</span>
+</div>
+</div>
+<!-- Dish 3 -->
+<div class="flex flex-col gap-stack-md group md:mt-24">
+<div class="h-[400px] overflow-hidden rustic-border">
+<img alt="Volcán de Chocolate" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A decadent, rustic dessert featuring a rich, warm chocolate lava cake with a molten center spilling onto a crisp white plate. Beside it sits a perfect quenelle of artisanal vanilla bean ice cream, garnished with delicate orange zest and fresh mint. The photograph is taken in warm, inviting light with a shallow depth of field, emphasizing the gooey texture of the chocolate and the creamy, cool contrast of the ice cream. The overall aesthetic is indulgent, modern, and perfectly balanced against the creamy white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQGTdDpN8s9h6bdK6N9snj8sLPGey-yBNom_qIzsaQGlTKn8IDFXJUZ-_1M_ZC3z8sM98a2EojxpkQS1RSFB7k4swkStF4hGhcnowFAFE92Gaz4Vve9dcyu6LXLKZxUI1XLkzPY47_b_DCfsg2UENPwer_J0CRWncvTED0eWS8HCbod8bhibxgvI2SqtWoE6ft5lFMkd2sMj6V_1i-H0WzZk5mVVZeRC87bMWFgEdyiPI3s02H6e6z4XMEHrfYOSzRW28DJNsjQwQ"/>
+</div>
+<div class="flex justify-between items-start mt-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Volcán de Chocolate</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Warm, molten chocolate cake with a hint of local spice, paired with vanilla bean ice cream.</p>
+</div>
+<span class="font-headline-md text-headline-md text-outline">$12</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Editorial Reservations Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container border-y rustic-border" id="reservations">
+<div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-section-gap items-center">
+<div class="w-full md:w-1/2">
+<h2 class="font-headline-lg-mobile md:text-[3.5rem] leading-tight text-primary font-900 mb-stack-md">Asegura tu<br/>Lugar</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg">
+                    Join us for an unforgettable dining experience. Reserve your table below to ensure a seamless evening.
+                </p>
+<div class="w-16 h-1 bg-outline-variant"></div>
+</div>
+<div class="w-full md:w-1/2 bg-surface p-stack-lg rustic-border">
+<form class="flex flex-col gap-stack-md">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-stack-md">
+<div class="flex flex-col gap-1 border-b rustic-border pb-2">
+<label class="font-label-md text-label-md text-outline uppercase tracking-widest text-xs" for="date">Date</label>
+<input class="w-full bg-transparent border-none py-2 px-0 focus:ring-0 font-body-md text-body-md text-on-surface" id="date" required="" type="date"/>
+</div>
+<div class="flex flex-col gap-1 border-b rustic-border pb-2">
+<label class="font-label-md text-label-md text-outline uppercase tracking-widest text-xs" for="time">Time</label>
+<input class="w-full bg-transparent border-none py-2 px-0 focus:ring-0 font-body-md text-body-md text-on-surface" id="time" required="" type="time"/>
+</div>
+</div>
+<div class="flex flex-col gap-1 border-b rustic-border pb-2">
+<label class="font-label-md text-label-md text-outline uppercase tracking-widest text-xs" for="guests">Guests</label>
+<select class="w-full bg-transparent border-none py-2 px-0 focus:ring-0 font-body-md text-body-md text-on-surface appearance-none" id="guests">
+<option value="1">1 Person</option>
+<option selected="" value="2">2 People</option>
+<option value="3">3 People</option>
+<option value="4">4 People</option>
+<option value="5">5+ People (Please contact us)</option>
+</select>
+</div>
+<div class="flex flex-col gap-1 border-b rustic-border pb-2">
+<label class="font-label-md text-label-md text-outline uppercase tracking-widest text-xs" for="name">Name</label>
+<input class="w-full bg-transparent border-none py-2 px-0 focus:ring-0 font-body-md text-body-md text-on-surface" id="name" placeholder="Tu Nombre" required="" type="text"/>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-none hover:bg-on-primary-fixed-variant transition-colors mt-stack-md uppercase tracking-widest w-full" type="submit">
+                    Confirm Reservation
+                </button>
+</form>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full pt-section-gap pb-stack-lg bg-surface">
+<div class="flex flex-col md:flex-row justify-between items-start px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto gap-stack-lg">
+<div class="flex flex-col gap-stack-sm max-w-sm">
+<div class="font-display-lg text-[2rem] text-primary uppercase tracking-tighter mb-4">
+                    El Capirucho
+                </div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Traditional Heritage, Modern Taste. Experience the warmth of our hearth.
+                </p>
+</div>
+<div class="flex flex-col md:flex-row gap-section-gap">
+<div class="flex flex-col gap-stack-sm">
+<h4 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-4">Visit</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">123 Culinary Ave,<br/>Gourmet City, GC 90210</p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<h4 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-4">Connect</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Instagram</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Facebook</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a>
+</div>
+</div>
+</div>
+<div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto mt-section-gap pt-stack-md border-t rustic-border flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
+<p class="font-caption text-caption text-outline uppercase tracking-widest">
+                © 2024 El Capirucho. All rights reserved.
+            </p>
+<div class="flex gap-4">
+<a class="font-caption text-caption text-outline hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacy</a>
+<a class="font-caption text-caption text-outline hover:text-primary transition-colors uppercase tracking-widest" href="#">Terms</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,248 @@
+/* ============================================
+   Componentes base — estetica editorial rustica
+   ============================================ */
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-block;
+  padding: 16px 32px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, transform 0.15s;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.btn-primary:hover {
+  background: var(--on-primary-fixed-variant);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--on-surface-variant);
+  padding: 8px 16px;
+}
+
+.btn-ghost:hover {
+  color: var(--primary);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: var(--on-error);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 12px;
+}
+
+/* ---------- Inputs ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: var(--border-soft);
+  padding-bottom: 8px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--outline);
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  font-size: 16px;
+  color: var(--on-surface);
+  outline: none;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--outline);
+}
+
+.field:focus-within {
+  border-bottom-color: var(--primary);
+}
+
+.field-error {
+  border-bottom-color: var(--error);
+}
+
+.field-error-msg {
+  font-size: 12px;
+  color: var(--error);
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  border: var(--border);
+  padding: var(--stack-lg);
+}
+
+.card-elevated {
+  box-shadow: var(--glow-shadow);
+}
+
+.card-flat {
+  background: var(--surface-container-low);
+  border: none;
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(29, 28, 24, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--margin-mobile);
+  animation: fade-in 0.25s ease;
+}
+
+.modal {
+  background: var(--surface);
+  border: var(--border);
+  padding: var(--stack-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slide-up 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--stack-md);
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+}
+
+.badge-available {
+  background: var(--tertiary-fixed);
+  color: var(--on-tertiary-container);
+  color: #215025;
+}
+
+.badge-occupied {
+  background: var(--error-container);
+  color: var(--on-error-container);
+}
+
+.badge-reserved {
+  background: var(--secondary-fixed);
+  color: var(--on-secondary-container);
+}
+
+.badge-blocked {
+  background: var(--inverse-surface);
+  color: var(--inverse-on-surface);
+}
+
+/* ---------- Rustic helpers ---------- */
+.rustic-border {
+  border: var(--border);
+}
+
+.divider {
+  width: 64px;
+  height: 4px;
+  background: var(--outline-variant);
+}
+
+.divider-line {
+  height: 1px;
+  flex-grow: 1;
+  background: var(--outline-variant);
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.4s ease both;
+}
+
+.slide-up {
+  animation: slide-up 0.4s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
