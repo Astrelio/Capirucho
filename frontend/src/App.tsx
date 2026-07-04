@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import LandingPage from './features/landing/LandingPage';
+import Home from './pages/Home';
 import ReservarPage from './features/reservations/ReservarPage';
 import MenuPage from './features/menu/MenuPage';
 import LoginPage from './features/auth/LoginPage';
@@ -14,7 +14,7 @@ import DashboardPage from './features/dashboard/DashboardPage';
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<Home />} />
       <Route path="/reservar" element={<ReservarPage />} />
       <Route path="/menu" element={<MenuPage />} />
       <Route path="/login" element={<LoginPage />} />
