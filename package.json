@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "netlify dev",
     "build": "npm run build --prefix frontend",
+    "test": "npm run test --prefix frontend && npm run test --prefix netlify",
     "typecheck": "tsc --noEmit -p netlify && npm run typecheck --prefix frontend"
   },
   "dependencies": {
