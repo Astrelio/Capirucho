@@ -12,19 +12,19 @@ function renderApp(route = '/') {
 }
 
 describe('App routing', () => {
-  it('renders LandingPage at /', () => {
+  it('renders Home at /', () => {
     renderApp('/');
-    expect(screen.getByText(/sabor que/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'El Capirucho' })).toBeInTheDocument();
   });
 
-  it('renders ReservarPage at /reservar', () => {
+  it('renders ReservationPage at /reservar', () => {
     renderApp('/reservar');
-    expect(screen.getByText('Reservar')).toBeInTheDocument();
+    expect(screen.getByText('Reserva tu Mesa')).toBeInTheDocument();
   });
 
   it('renders MenuPage at /menu', () => {
     renderApp('/menu');
-    expect(screen.getByText('Menú')).toBeInTheDocument();
+    expect(screen.getByText('Nuestro Menú')).toBeInTheDocument();
   });
 
   it('renders LoginPage at /login', () => {
