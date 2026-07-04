@@ -5,9 +5,10 @@ interface AuthFormShellProps {
   title: string;
   subtitle: string;
   submitLabel: string;
-  onSubmit: () => void;
+  onSubmit: () => void | Promise<void>;
   children: ReactNode;
   footnote: ReactNode;
+  submitDisabled?: boolean;
 }
 
 export default function AuthFormShell({
@@ -18,6 +19,7 @@ export default function AuthFormShell({
   onSubmit,
   children,
   footnote,
+  submitDisabled,
 }: AuthFormShellProps) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +35,12 @@ export default function AuthFormShell({
       <form className="auth-form" onSubmit={handleSubmit}>
         {children}
 
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          style={{ width: '100%' }}
+          disabled={submitDisabled}
+        >
           {submitLabel}
         </button>
       </form>
