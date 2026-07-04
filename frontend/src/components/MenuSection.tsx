@@ -1,35 +1,12 @@
+import { Link } from 'react-router-dom';
 import { useInView } from '../hooks/useInView';
-
-interface Dish {
-  name: string;
-  description: string;
-  price: string;
-  image: string;
-  offset?: boolean;
-}
-
-const DISHES: Dish[] = [
-  {
-    name: 'Ceviche Tradicional',
-    description:
-      'Fresh catch of the day cured in citrus juices, spiced with aji pepper and sweet potato.',
-    price: '$22',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCZbThG4zDsMoaM_MMPbcodtvGtvgzTVFiuxmPmzMtDCifM2ZrZQviI2Rd-Dsf5TO0Q196wHDkQzPEFhpb1o7gAT_e9KhS4p7D-s49hnDUmn34ifVbCFObzOSfnbDJY4dJeiwRNdsAeVB1JjvKvZ62wsBZbpvsqD5lMJpWxlHyJMpEPvfKZux1At2QBvRe1NxjlK9oNvEtPEx9cgls15TOZroY9BqVH4enK9ImRBIhCjIwvUZgoUYyU8sn94RAilZleTL7SXjM_4rM',
-  },
-  {
-    name: 'Volcán de Chocolate',
-    description:
-      'Warm, molten chocolate cake with a hint of local spice, paired with vanilla bean ice cream.',
-    price: '$12',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAQGTdDpN8s9h6bdK6N9snj8sLPGey-yBNom_qIzsaQGlTKn8IDFXJUZ-_1M_ZC3z8sM98a2EojxpkQS1RSFB7k4swkStF4hGhcnowFAFE92Gaz4Vve9dcyu6LXLKZxUI1XLkzPY47_b_DCfsg2UENPwer_J0CRWncvTED0eWS8HCbod8bhibxgvI2SqtWoE6ft5lFMkd2sMj6V_1i-H0WzZk5mVVZeRC87bMWFgEdyiPI3s02H6e6z4XMEHrfYOSzRW28DJNsjQwQ',
-    offset: true,
-  },
-];
+import { dishes } from '../data/dishes';
+import DishCard from './DishCard';
 
 export default function MenuSection() {
   const { ref, inView } = useInView<HTMLElement>();
+  const destacados = dishes.slice(1, 3);
+
   return (
     <section
       ref={ref}
@@ -38,40 +15,26 @@ export default function MenuSection() {
     >
       <div className="home-menu-head">
         <h2 className="home-h2" style={{ maxWidth: '28rem' }}>
-          Delicias del Mar y la Tierra
+          Platillos Destacados
         </h2>
-        <a href="#menu" className="home-menu-link">
-          View Full Menu
-        </a>
+        <p className="body-lg" style={{ color: 'var(--on-surface-variant)', maxWidth: '24rem' }}>
+          Una probada de nuestra mesa. Descubre algunos de los favoritos de la casa.
+        </p>
       </div>
 
       <div className="home-menu-grid">
-        {DISHES.map((dish) => (
-          <article
-            key={dish.name}
-            className={`home-dish${dish.offset ? ' home-dish--offset' : ''}`}
-          >
-            <div className="home-dish-frame">
-              <img src={dish.image} alt={dish.name} />
-            </div>
-            <div className="home-dish-meta">
-              <div>
-                <h3 className="headline-md home-dish-title" style={{ marginBottom: 8 }}>
-                  {dish.name}
-                </h3>
-                <p
-                  className="body-md"
-                  style={{ color: 'var(--on-surface-variant)', maxWidth: '24rem' }}
-                >
-                  {dish.description}
-                </p>
-              </div>
-              <span className="headline-md" style={{ color: 'var(--outline)' }}>
-                {dish.price}
-              </span>
-            </div>
-          </article>
+        {destacados.map((dish, i) => (
+          <DishCard key={dish.name} dish={dish} offset={i === 1} />
         ))}
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 'var(--section-gap)' }}>
+        <Link to="/menu" className="cta-fill">
+          Ver Menú Completo
+          <span className="cta-arrow" aria-hidden="true">
+            →
+          </span>
+        </Link>
       </div>
     </section>
   );

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const NAV = [
-  { label: 'Story', href: '#story' },
-  { label: 'Menu', href: '#menu' },
-  { label: 'Reserve', href: '#reservations' },
+  { label: 'Story', to: '/#story' },
+  { label: 'Menu', to: '/menu' },
+  { label: 'Reserve', to: '/reservar' },
 ];
 
 export default function Header() {
@@ -19,22 +20,22 @@ export default function Header() {
   return (
     <header className={`home-header${scrolled ? ' home-header--scrolled' : ''}`}>
       <div className="home-header-inner">
-        <a href="#top" className="home-logo">
+        <Link to="/" className="home-logo">
           El Capirucho
-        </a>
+        </Link>
 
         <nav className="home-nav">
           {NAV.map((item) => (
-            <a key={item.href} href={item.href}>
+            <Link key={item.to} to={item.to}>
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         <div className="home-cta-desktop">
-          <a href="#reservations" className="btn btn-outline btn-sm">
-            Book a Table
-          </a>
+          <Link to="/login" className="btn btn-outline btn-sm">
+            Iniciar Sesión
+          </Link>
         </div>
 
         <button className="home-burger" type="button" aria-label="Abrir menú">

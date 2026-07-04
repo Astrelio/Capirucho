@@ -542,12 +542,193 @@
   animation: ken-burns 20s ease-in-out infinite alternate;
 }
 
+/* ---------- CTA sofisticado (relleno + flecha) ---------- */
+.cta-fill {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+  padding: 16px 36px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  cursor: pointer;
+  transition: color 0.5s ease-out;
+}
+
+.cta-fill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease-out;
+}
+
+.cta-fill:hover {
+  color: var(--on-primary);
+}
+
+.cta-fill:hover::before {
+  transform: scaleX(1);
+}
+
+/* Variante sólida (fondo terracota que se aclara al hover) */
+.cta-fill--solid {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+.cta-fill--solid::before {
+  background: var(--on-primary-fixed-variant);
+}
+
+.cta-arrow {
+  display: inline-block;
+  transition: transform 0.5s ease-out;
+}
+
+.cta-fill:hover .cta-arrow {
+  transform: translateX(6px);
+}
+
+/* Banda CTA centrada (Home → Reservas) */
+.home-cta-band {
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--stack-md);
+}
+
+/* ---------- MenuPage: grid + entrada en cascada (staggered) ---------- */
+.menu-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--section-gap);
+}
+
+@media (min-width: 640px) {
+  .menu-page-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-page-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+/* ---------- ReservationPage: form flotante + focus ---------- */
+.res-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: var(--section-gap) var(--margin-mobile);
+  background: var(--surface-container-low);
+}
+
+.res-page-inner {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-lg);
+}
+
+.res-intro {
+  text-align: center;
+}
+
+.res-panel {
+  background: var(--surface);
+  border: var(--border);
+  padding: var(--stack-lg);
+  box-shadow: var(--glow-shadow);
+}
+
+.res-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--stack-md);
+}
+
+@media (min-width: 640px) {
+  .res-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Entrada: el panel flota suavemente hacia el centro */
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.res-float {
+  animation: float-in 0.7s ease-out both;
+}
+
+/* Foco sutil en el campo activo con la paleta terracota/primary */
+.res-form .field {
+  padding-inline: 10px;
+  border-radius: 2px;
+  transition: border-color 0.5s ease-out, background 0.5s ease-out;
+}
+
+.res-form .field:focus-within {
+  border-bottom-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+.res-form .field:focus-within label {
+  color: var(--primary);
+  transition: color 0.5s ease-out;
+}
+
 /* Respeta accesibilidad: sin movimiento si el usuario lo pide */
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .stagger-item,
+  .res-float {
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
   }
   .home-hero-media img {
     animation: none;

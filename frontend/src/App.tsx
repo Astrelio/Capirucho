@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import ReservarPage from './features/reservations/ReservarPage';
-import MenuPage from './features/menu/MenuPage';
+import ReservationPage from './pages/ReservationPage';
+import MenuPage from './pages/MenuPage';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import AdminLayout from './features/admin/AdminLayout';
@@ -15,7 +15,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/reservar" element={<ReservarPage />} />
+      <Route path="/reservar" element={<ReservationPage />} />
       <Route path="/menu" element={<MenuPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
