@@ -1,13 +1,29 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { resetPassword } from '../../services/authService';
 import type { AuthFormProps } from './types';
 
 export default function ForgotPasswordForm({ onSwitch }: AuthFormProps) {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Solo UI por ahora: aquí iría el envío del enlace de recuperación.
+    if (loading) return;
+
+    setLoading(true);
+    setError(null);
+    setInfo(null);
+    try {
+      await resetPassword(email.trim());
+      setInfo('Enlace enviado. Revisa tu correo.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo enviar el enlace.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,8 +48,19 @@ export default function ForgotPasswordForm({ onSwitch }: AuthFormProps) {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-          Enviar enlace
+        {error && (
+          <p role="alert" style={{ color: 'var(--error)', fontSize: 14, margin: 0 }}>
+            {error}
+          </p>
+        )}
+        {info && (
+          <p role="status" style={{ color: 'var(--tertiary)', fontSize: 14, margin: 0 }}>
+            {info}
+          </p>
+        )}
+
+        <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+          {loading ? 'Enviando…' : 'Enviar enlace'}
         </button>
       </form>
 

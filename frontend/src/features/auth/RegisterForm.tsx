@@ -1,16 +1,47 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { signUp, PUBLIC_MAP } from '../../services/authService';
 import type { AuthFormProps } from './types';
 
 export default function RegisterForm({ onSwitch }: AuthFormProps) {
+  const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Solo UI por ahora: aquí iría el registro.
+    if (loading) return;
+
+    if (password !== confirm) {
+      setError('Las contraseñas no coinciden.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('La contraseña debe tener mínimo 8 caracteres.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const session = await signUp({ fullName: fullName.trim(), email: email.trim(), password });
+      if (session) {
+        navigate(PUBLIC_MAP, { replace: true });
+      } else {
+        setInfo('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo crear la cuenta.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,8 +105,19 @@ export default function RegisterForm({ onSwitch }: AuthFormProps) {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-          Crear Cuenta
+        {error && (
+          <p role="alert" style={{ color: 'var(--error)', fontSize: 14, margin: 0 }}>
+            {error}
+          </p>
+        )}
+        {info && (
+          <p role="status" style={{ color: 'var(--tertiary)', fontSize: 14, margin: 0 }}>
+            {info}
+          </p>
+        )}
+
+        <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+          {loading ? 'Creando…' : 'Crear Cuenta'}
         </button>
       </form>
 
