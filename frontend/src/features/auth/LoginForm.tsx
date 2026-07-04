@@ -1,14 +1,36 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { roleHomePath } from '../../services/authService';
 import type { AuthFormProps } from './types';
 
 export default function LoginForm({ onSwitch }: AuthFormProps) {
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Solo UI por ahora: aquí iría la autenticación.
+    if (loading) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const role = await signIn(email.trim(), password);
+      // Si venía redirigido desde una ruta protegida, respétala; si no, redirección por rol.
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(from ?? roleHomePath(role), { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,8 +74,19 @@ export default function LoginForm({ onSwitch }: AuthFormProps) {
           </button>
         </div>
 
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-          Iniciar Sesión
+        {error && (
+          <p role="alert" style={{ color: 'var(--error)', fontSize: 14, margin: 0 }}>
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          className="btn btn-primary"
+          style={{ width: '100%' }}
+          disabled={loading}
+        >
+          {loading ? 'Ingresando…' : 'Iniciar Sesión'}
         </button>
       </form>
 
