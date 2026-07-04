@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import type { FormEvent } from 'react';
 import type { AuthFormProps } from './types';
+import TextField from '../../components/ui/TextField';
+import AuthFormShell from './AuthFormShell';
+import AuthLinkButton from './AuthLinkButton';
 
 export default function RegisterForm({ onSwitch }: AuthFormProps) {
   const [fullName, setFullName] = useState('');
@@ -8,83 +10,66 @@ export default function RegisterForm({ onSwitch }: AuthFormProps) {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     // Solo UI por ahora: aquí iría el registro.
   };
 
   return (
-    <div className="auth-view">
-      <span className="auth-eyebrow">Únete a la mesa</span>
-      <h1 className="auth-title">Crear Cuenta</h1>
-      <p className="auth-subtitle">
-        Reserva más rápido y guarda tus lugares favoritos del restaurante.
-      </p>
+    <AuthFormShell
+      eyebrow="Únete a la mesa"
+      title="Crear Cuenta"
+      subtitle="Reserva más rápido y guarda tus lugares favoritos del restaurante."
+      submitLabel="Crear Cuenta"
+      onSubmit={handleSubmit}
+      footnote={
+        <>
+          ¿Ya tienes cuenta?
+          <AuthLinkButton onClick={() => onSwitch('login')}>Iniciar sesión</AuthLinkButton>
+        </>
+      }
+    >
+      <TextField
+        id="register-name"
+        label="Nombre completo"
+        autoComplete="name"
+        placeholder="Tu nombre"
+        value={fullName}
+        onChange={setFullName}
+        required
+      />
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="register-name">Nombre completo</label>
-          <input
-            id="register-name"
-            type="text"
-            autoComplete="name"
-            placeholder="Tu nombre"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
-        </div>
+      <TextField
+        id="register-email"
+        label="Correo electrónico"
+        type="email"
+        autoComplete="email"
+        placeholder="tu@correo.com"
+        value={email}
+        onChange={setEmail}
+        required
+      />
 
-        <div className="field">
-          <label htmlFor="register-email">Correo electrónico</label>
-          <input
-            id="register-email"
-            type="email"
-            autoComplete="email"
-            placeholder="tu@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+      <TextField
+        id="register-password"
+        label="Contraseña"
+        type="password"
+        autoComplete="new-password"
+        placeholder="Mínimo 8 caracteres"
+        value={password}
+        onChange={setPassword}
+        required
+      />
 
-        <div className="field">
-          <label htmlFor="register-password">Contraseña</label>
-          <input
-            id="register-password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Mínimo 8 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="register-confirm">Confirmar contraseña</label>
-          <input
-            id="register-confirm"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Repite tu contraseña"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-          Crear Cuenta
-        </button>
-      </form>
-
-      <p className="auth-footnote">
-        ¿Ya tienes cuenta?
-        <button type="button" className="auth-link" onClick={() => onSwitch('login')}>
-          Iniciar sesión
-        </button>
-      </p>
-    </div>
+      <TextField
+        id="register-confirm"
+        label="Confirmar contraseña"
+        type="password"
+        autoComplete="new-password"
+        placeholder="Repite tu contraseña"
+        value={confirm}
+        onChange={setConfirm}
+        required
+      />
+    </AuthFormShell>
   );
 }
