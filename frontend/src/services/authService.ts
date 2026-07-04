@@ -23,6 +23,33 @@ export async function signIn(email: string, password: string): Promise<Session> 
   return data.session;
 }
 
+/** Registra un usuario nuevo. El perfil se crea vía trigger en la DB. */
+export async function signUp(input: {
+  fullName: string;
+  email: string;
+  password: string;
+  phone?: string;
+}): Promise<Session | null> {
+  const { data, error } = await supabase.auth.signUp({
+    email: input.email,
+    password: input.password,
+    options: {
+      data: { full_name: input.fullName, phone: input.phone ?? null },
+    },
+  });
+  if (error) throw new Error(friendlyError(error.message));
+  // session null => proyecto requiere confirmación por email
+  return data.session;
+}
+
+/** Envía email de recuperación de contraseña. */
+export async function resetPassword(email: string): Promise<void> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/login`,
+  });
+  if (error) throw new Error(friendlyError(error.message));
+}
+
 /** Cierra la sesión activa. */
 export async function signOut(): Promise<void> {
   const { error } = await supabase.auth.signOut();
