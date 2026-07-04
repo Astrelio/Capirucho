@@ -1,5 +1,5 @@
-import Placeholder from '../../components/ui/Placeholder';
+import AuthPage from './AuthPage';
 
 export default function LoginPage() {
-  return <Placeholder title="Login" fase="FASE 1 — Autenticación" />;
+  return <AuthPage initialView="login" />;
 }

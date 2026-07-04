@@ -1,0 +1,186 @@
+/* ============================================
+   Auth flow — split screen editorial (El Capirucho)
+   Reutiliza tokens globales (globals.css / components.css).
+   Alcance: solo features/auth.
+   ============================================ */
+
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--background);
+}
+
+/* Split screen en desktop: imagen + panel */
+@media (min-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+
+/* ---------- Columna imagen ---------- */
+.auth-media {
+  position: relative;
+  display: none;
+  min-height: 240px;
+  background-size: cover;
+  background-position: center;
+  border-right: var(--border);
+}
+
+@media (min-width: 900px) {
+  .auth-media {
+    display: block;
+  }
+}
+
+.auth-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(29, 28, 24, 0.15) 0%,
+    rgba(62, 4, 0, 0.35) 55%,
+    rgba(160, 59, 40, 0.75) 100%
+  );
+}
+
+.auth-media-content {
+  position: absolute;
+  inset: auto var(--stack-lg) var(--stack-lg) var(--stack-lg);
+  z-index: 1;
+  color: var(--on-primary);
+}
+
+.auth-brand {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(28px, 3vw, 40px);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--on-primary);
+}
+
+.auth-media-quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.3;
+  margin-top: var(--stack-sm);
+  max-width: 26rem;
+  color: var(--primary-fixed);
+}
+
+.auth-media-tag {
+  display: inline-block;
+  margin-top: var(--stack-md);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--secondary-fixed);
+}
+
+/* ---------- Columna panel/formulario ---------- */
+.auth-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--stack-lg) var(--margin-mobile);
+}
+
+@media (min-width: 900px) {
+  .auth-panel {
+    padding: var(--section-gap) var(--margin-desktop);
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: var(--border);
+  padding: var(--stack-lg);
+}
+
+@media (min-width: 900px) {
+  .auth-card {
+    box-shadow: var(--glow-shadow);
+    padding: calc(var(--stack-lg) * 1.25);
+  }
+}
+
+.auth-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  margin-top: var(--stack-sm);
+}
+
+.auth-subtitle {
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  line-height: 1.5;
+  margin-top: var(--stack-sm);
+  max-width: 34ch;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-md);
+  margin-top: var(--stack-lg);
+}
+
+.auth-row-between {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Enlaces de cambio de vista */
+.auth-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.auth-link:hover {
+  border-bottom-color: var(--primary);
+  color: var(--on-primary-fixed-variant);
+}
+
+.auth-footnote {
+  margin-top: var(--stack-lg);
+  padding-top: var(--stack-md);
+  border-top: var(--border-soft);
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Transición suave al alternar vistas */
+.auth-view {
+  animation: fade-in 0.35s ease both;
+}
