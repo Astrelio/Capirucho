@@ -1,0 +1,736 @@
+/* ============================================
+   Landing "Home" — layout editorial rústico (diseño v1)
+   Reutiliza tokens de globals.css / components.css.
+   Aquí solo lo que inline styles no cubren: :hover, media
+   queries, solapamientos y transiciones.
+   ============================================ */
+
+/* ---------- Header ---------- */
+.home-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  /* Transparente arriba; gana glassmorphism al hacer scroll. */
+  background: transparent;
+  backdrop-filter: blur(0);
+  border-bottom: 1px solid transparent;
+  transition: background 0.5s ease-out, backdrop-filter 0.5s ease-out,
+    border-color 0.5s ease-out, box-shadow 0.5s ease-out;
+}
+
+.home-header--scrolled {
+  background: color-mix(in srgb, var(--background) 82%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: var(--border);
+  box-shadow: 0 4px 20px -12px rgba(160, 59, 40, 0.25);
+}
+
+.home-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--margin-mobile);
+  padding-block: var(--stack-md);
+}
+
+.home-logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: 1;
+}
+
+.home-nav {
+  display: none;
+}
+
+.home-nav a {
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.3s, transform 0.15s;
+}
+
+.home-nav a:hover {
+  color: var(--primary);
+}
+
+.home-nav a:active {
+  transform: scale(0.95);
+}
+
+.home-cta-desktop {
+  display: none;
+}
+
+.home-burger {
+  display: inline-flex;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+@media (min-width: 768px) {
+  .home-header-inner {
+    padding-inline: var(--margin-desktop);
+  }
+  .home-nav {
+    display: flex;
+    gap: var(--gutter);
+    align-items: center;
+  }
+  .home-cta-desktop {
+    display: block;
+  }
+  .home-burger {
+    display: none;
+  }
+}
+
+/* ---------- Hero ---------- */
+.home-hero {
+  position: relative;
+  width: 100%;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  background: var(--surface-container-low);
+  padding: calc(var(--section-gap) + var(--stack-lg)) var(--margin-mobile) var(--stack-lg);
+}
+
+.home-hero-copy {
+  width: 100%;
+  z-index: 10;
+  max-width: 42rem;
+  text-align: center;
+  margin-bottom: var(--stack-lg);
+}
+
+.home-hero-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--primary);
+  font-size: clamp(48px, 11vw, 112px);
+  margin-bottom: var(--stack-md);
+}
+
+.home-hero-title span {
+  color: var(--outline);
+}
+
+.home-hero-media {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  z-index: 0;
+}
+
+.home-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-quote-card {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .home-hero {
+    flex-direction: row;
+    align-items: center;
+    padding-inline: var(--margin-desktop);
+  }
+  .home-hero-copy {
+    width: 50%;
+    text-align: left;
+    margin-bottom: 0;
+    margin-left: auto;
+    padding-right: 3rem;
+  }
+  .home-hero-media {
+    width: 50%;
+    height: 80vh;
+  }
+  .home-quote-card {
+    display: block;
+    position: absolute;
+    bottom: 3rem;
+    left: -1.5rem;
+    z-index: 20;
+    max-width: 18rem;
+    background: var(--surface);
+    padding: var(--stack-md);
+    border: var(--border);
+  }
+}
+
+/* ---------- Secciones con solapamiento ---------- */
+.home-split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--section-gap);
+  position: relative;
+}
+
+.home-story-img {
+  width: 100%;
+  z-index: 10;
+  position: relative;
+}
+
+.home-story-img img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+}
+
+.home-story-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-lg);
+  z-index: 20;
+  background: var(--surface);
+  padding: var(--stack-lg);
+  border: var(--border);
+}
+
+@media (min-width: 768px) {
+  .home-split {
+    flex-direction: row;
+    align-items: center;
+  }
+  .home-story-img {
+    width: 41.6667%;
+  }
+  .home-story-img img {
+    height: 600px;
+  }
+  .home-story-panel {
+    width: 58.3333%;
+    margin-left: -6rem;
+    padding: var(--section-gap);
+  }
+}
+
+.home-h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1.1;
+  font-size: clamp(36px, 6vw, 56px);
+}
+
+/* ---------- Featured dish ---------- */
+.home-featured {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-container-highest);
+  padding-block: var(--section-gap);
+}
+
+.home-featured-bg {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .home-featured-bg {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 33.3333%;
+    height: 100%;
+    background: var(--surface-container-low);
+  }
+}
+
+.home-featured-inner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--section-gap);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--margin-mobile);
+}
+
+.home-featured-copy {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-md);
+  order: 2;
+}
+
+.home-featured-media {
+  width: 100%;
+  order: 1;
+}
+
+.home-featured-media img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+}
+
+@media (min-width: 1024px) {
+  .home-featured-inner {
+    flex-direction: row;
+    align-items: center;
+    padding-inline: var(--margin-desktop);
+  }
+  .home-featured-copy {
+    width: 50%;
+    order: 1;
+  }
+  .home-featured-media {
+    width: 50%;
+    order: 2;
+  }
+}
+
+.home-price-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ---------- Menu grid (editorial) ---------- */
+.home-menu-head {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--stack-md);
+  margin-bottom: var(--stack-lg);
+}
+
+.home-menu-link {
+  border-bottom: 1px solid var(--primary);
+  color: var(--primary);
+  padding-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.3s;
+  display: inline-block;
+}
+
+.home-menu-link:hover {
+  color: var(--outline);
+}
+
+.home-menu-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--section-gap);
+}
+
+.home-dish {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-md);
+}
+
+.home-dish-frame {
+  height: 400px;
+  overflow: hidden;
+  border: var(--border);
+}
+
+.home-dish-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease-out;
+  will-change: transform;
+}
+
+.home-dish:hover .home-dish-frame img {
+  transform: scale(1.05);
+}
+
+/* Título con subrayado animado (crece de izq. a der.) */
+.home-dish-title {
+  color: var(--on-surface);
+  display: inline;
+  padding-bottom: 3px;
+  background-image: linear-gradient(var(--primary), var(--primary));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.5s ease-out, color 0.5s ease-out;
+}
+
+.home-dish:hover .home-dish-title {
+  color: var(--primary);
+  background-size: 100% 2px;
+}
+
+.home-dish-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+@media (min-width: 768px) {
+  .home-menu-head {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+  .home-menu-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .home-dish--offset {
+    margin-top: 6rem;
+  }
+}
+
+/* ---------- Reservación ---------- */
+.home-reservation {
+  padding-block: var(--section-gap);
+  padding-inline: var(--margin-mobile);
+  background: var(--surface-container);
+  border-block: var(--border);
+}
+
+.home-reservation-inner {
+  max-width: 64rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  align-items: center;
+}
+
+.home-reservation-panel {
+  width: 100%;
+  background: var(--surface);
+  padding: var(--stack-lg);
+  border: var(--border);
+}
+
+.home-reservation-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--stack-md);
+}
+
+@media (min-width: 640px) {
+  .home-reservation-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-reservation {
+    padding-inline: var(--margin-desktop);
+  }
+  .home-reservation-inner {
+    flex-direction: row;
+  }
+  .home-reservation-inner > * {
+    width: 50%;
+  }
+}
+
+/* ---------- Footer ---------- */
+.home-footer {
+  width: 100%;
+  padding-top: var(--section-gap);
+  padding-bottom: var(--stack-lg);
+  background: var(--surface);
+}
+
+.home-footer-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--stack-lg);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--margin-mobile);
+}
+
+.home-footer-cols {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.home-footer-bottom {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--margin-mobile);
+  margin-top: var(--section-gap);
+  padding-top: var(--stack-md);
+  border-top: var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.home-footer a:hover {
+  color: var(--primary);
+}
+
+@media (min-width: 768px) {
+  .home-footer-top,
+  .home-footer-bottom {
+    flex-direction: row;
+    padding-inline: var(--margin-desktop);
+    text-align: left;
+  }
+  .home-footer-cols {
+    flex-direction: row;
+  }
+}
+
+/* ============================================
+   Micro-interacciones (editorial premium)
+   ============================================ */
+
+/* ---------- Scroll reveal (fade-in-up) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Ken Burns: zoom lento e infinito en el hero ---------- */
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+.home-hero-media img {
+  animation: ken-burns 20s ease-in-out infinite alternate;
+}
+
+/* ---------- CTA sofisticado (relleno + flecha) ---------- */
+.cta-fill {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+  padding: 16px 36px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  cursor: pointer;
+  transition: color 0.5s ease-out;
+}
+
+.cta-fill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease-out;
+}
+
+.cta-fill:hover {
+  color: var(--on-primary);
+}
+
+.cta-fill:hover::before {
+  transform: scaleX(1);
+}
+
+/* Variante sólida (fondo terracota que se aclara al hover) */
+.cta-fill--solid {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+.cta-fill--solid::before {
+  background: var(--on-primary-fixed-variant);
+}
+
+.cta-arrow {
+  display: inline-block;
+  transition: transform 0.5s ease-out;
+}
+
+.cta-fill:hover .cta-arrow {
+  transform: translateX(6px);
+}
+
+/* Banda CTA centrada (Home → Reservas) */
+.home-cta-band {
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--stack-md);
+}
+
+/* ---------- MenuPage: grid + entrada en cascada (staggered) ---------- */
+.menu-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--section-gap);
+}
+
+@media (min-width: 640px) {
+  .menu-page-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-page-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+/* ---------- ReservationPage: form flotante + focus ---------- */
+.res-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: var(--section-gap) var(--margin-mobile);
+  background: var(--surface-container-low);
+}
+
+.res-page-inner {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-lg);
+}
+
+.res-intro {
+  text-align: center;
+}
+
+.res-panel {
+  background: var(--surface);
+  border: var(--border);
+  padding: var(--stack-lg);
+  box-shadow: var(--glow-shadow);
+}
+
+.res-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--stack-md);
+}
+
+@media (min-width: 640px) {
+  .res-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Entrada: el panel flota suavemente hacia el centro */
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.res-float {
+  animation: float-in 0.7s ease-out both;
+}
+
+/* Foco sutil en el campo activo con la paleta terracota/primary */
+.res-form .field {
+  padding-inline: 10px;
+  border-radius: 2px;
+  transition: border-color 0.5s ease-out, background 0.5s ease-out;
+}
+
+.res-form .field:focus-within {
+  border-bottom-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+.res-form .field:focus-within label {
+  color: var(--primary);
+  transition: color 0.5s ease-out;
+}
+
+/* Respeta accesibilidad: sin movimiento si el usuario lo pide */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .stagger-item,
+  .res-float {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+  .home-hero-media img {
+    animation: none;
+  }
+}

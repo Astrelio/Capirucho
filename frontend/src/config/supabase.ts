@@ -17,4 +17,14 @@ if (missing.length > 0) {
   );
 }
 
-export const supabase = createClient(url as string, anonKey as string);
+export const supabase = createClient(url as string, anonKey as string, {
+  auth: {
+    // Persiste la sesión en localStorage y la restaura al recargar/navegar.
+    persistSession: true,
+    // Refresca el token de acceso automáticamente antes de expirar.
+    autoRefreshToken: true,
+    // Detecta tokens en la URL tras confirmar el correo (magic link / signup).
+    detectSessionInUrl: true,
+    storageKey: 'capirucho-auth',
+  },
+});

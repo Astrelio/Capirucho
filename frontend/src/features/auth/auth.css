@@ -11,10 +11,14 @@
   background: var(--background);
 }
 
-/* Split screen en desktop: imagen + panel */
+/* Split screen en desktop: imagen + panel.
+   Alto estricto = 100vh, sin crecer: el scroll vive solo en el panel. */
 @media (min-width: 900px) {
   .auth-shell {
     grid-template-columns: 1.1fr 1fr;
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
   }
 }
 
@@ -84,18 +88,25 @@
 /* ---------- Columna panel/formulario ---------- */
 .auth-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   padding: var(--stack-lg) var(--margin-mobile);
 }
 
+/* Solo el panel del formulario hace scroll interno si el contenido
+   (ej. Registro) excede el alto; la imagen y el fondo nunca se mueven. */
 @media (min-width: 900px) {
   .auth-panel {
-    padding: var(--section-gap) var(--margin-desktop);
+    height: 100vh;
+    overflow-y: auto;
+    padding: var(--stack-lg) var(--margin-desktop);
   }
 }
 
 .auth-card {
+  /* margin auto centra en ambos ejes y, al desbordar, permite scroll
+     completo (sin recortar la parte superior como haría justify-center). */
+  margin: auto;
+  flex-shrink: 0;
   width: 100%;
   max-width: 420px;
   background: var(--surface);
