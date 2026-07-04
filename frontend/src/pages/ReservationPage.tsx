@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../components/home.css';
@@ -15,6 +16,11 @@ export default function ReservationPage() {
             </h1>
             <p className="body-lg" style={{ color: 'var(--on-surface-variant)' }}>
               Asegura tu lugar y vive una experiencia inolvidable junto a nuestro hogar.
+            </p>
+            <p style={{ marginTop: 'var(--stack-md)' }}>
+              <Link to="/reservar/mapa" className="btn btn-outline">
+                Elegir mesa en el mapa
+              </Link>
             </p>
           </div>
 
