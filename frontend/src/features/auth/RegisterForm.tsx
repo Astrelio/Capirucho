@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { signUp, PUBLIC_MAP } from '../../services/authService';
 import type { AuthFormProps } from './types';
 
 export default function RegisterForm({ onSwitch }: AuthFormProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,8 +33,11 @@ export default function RegisterForm({ onSwitch }: AuthFormProps) {
     setInfo(null);
     try {
       const session = await signUp({ fullName: fullName.trim(), email: email.trim(), password });
+      const redirectParam = searchParams.get('redirect');
+      const destination =
+        redirectParam?.startsWith('/') ? redirectParam : PUBLIC_MAP;
       if (session) {
-        navigate(PUBLIC_MAP, { replace: true });
+        navigate(destination, { replace: true });
       } else {
         setInfo('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
       }

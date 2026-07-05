@@ -23,9 +23,14 @@ export default function LoginForm({ onSwitch }: AuthFormProps) {
     setError(null);
     try {
       const role = await signIn(email.trim(), password);
-      // Si venía redirigido desde una ruta protegida, respétala; si no, redirección por rol.
-      const from = (location.state as { from?: string } | null)?.from;
-      navigate(from ?? roleHomePath(role), { replace: true });
+      // Si venía redirigido (state o ?redirect=), respétala; si no, redirección por rol.
+      const fromState = (location.state as { from?: string } | null)?.from;
+      const redirectParam = new URLSearchParams(location.search).get('redirect');
+      const destination =
+        fromState ??
+        (redirectParam?.startsWith('/') ? redirectParam : null) ??
+        roleHomePath(role);
+      navigate(destination, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.');
     } finally {

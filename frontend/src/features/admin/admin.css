@@ -12,6 +12,14 @@
   margin-top: 4px;
 }
 
+.admin-page-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--stack-md);
+  flex-wrap: wrap;
+}
+
 .admin-notice {
   padding: 10px 14px;
   border-radius: 8px;

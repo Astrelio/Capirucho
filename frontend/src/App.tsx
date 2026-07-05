@@ -4,6 +4,7 @@ import ReservationPage from './pages/ReservationPage';
 import CancelReservationPage from './pages/CancelReservationPage';
 import PublicCanvas from './features/canvas/PublicCanvas';
 import MenuPage from './pages/MenuPage';
+import ReviewsPage from './pages/ReviewsPage';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -23,6 +24,7 @@ export default function App() {
       <Route path="/reservar/mapa" element={<PublicCanvas />} />
       <Route path="/reservar/cancelar" element={<CancelReservationPage />} />
       <Route path="/menu" element={<MenuPage />} />
+      <Route path="/resenas" element={<ReviewsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<ProtectedRoute allow={['admin', 'super_admin']} />}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { roleHomePath } from '../../services/authService';
 import type { AuthView } from './types';
@@ -29,11 +29,16 @@ const MEDIA: Record<AuthView, { image: string; quote: string }> = {
 export default function AuthPage({ initialView = 'login' }: { initialView?: AuthView }) {
   const [view, setView] = useState<AuthView>(initialView);
   const { isAuthenticated, loading, role } = useAuth();
+  const [searchParams] = useSearchParams();
   const media = MEDIA[view];
+
+  const redirectParam = searchParams.get('redirect');
+  const redirectTo =
+    redirectParam?.startsWith('/') ? redirectParam : roleHomePath(role);
 
   // Sesión ya activa -> no mostrar login de nuevo.
   if (!loading && isAuthenticated) {
-    return <Navigate to={roleHomePath(role)} replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (

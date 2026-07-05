@@ -6,6 +6,7 @@ import { ADMIN_HOME, isAdminRole } from '../services/authService';
 const NAV = [
   { label: 'Story', to: '/#story' },
   { label: 'Menu', to: '/menu' },
+  { label: 'Reseñas', to: '/resenas' },
   { label: 'Reserve', to: '/reservar' },
 ];
 
