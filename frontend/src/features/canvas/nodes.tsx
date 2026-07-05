@@ -1,6 +1,6 @@
 import { NodeResizer, type Node, type NodeProps } from '@xyflow/react';
-import { DoorOpen } from 'lucide-react';
-import type { AvailabilityResult, RestaurantTable, Zone } from './types';
+import { DoorOpen, Users } from 'lucide-react';
+import { ZONE_TYPE_LABELS, type AvailabilityResult, type RestaurantTable, type Zone } from './types';
 
 export type ZoneNodeData = {
   zone: Zone;
@@ -28,7 +28,10 @@ export function ZoneNodeView({ data, selected }: NodeProps<ZoneFlowNode>) {
       <div className="zone-node-fill" style={{ background: hexToRgba(zone.color, 0.13) }}>
         <div className="node-header">
           <span className="color-swatch" style={{ background: zone.color }} />
-          <strong>{zone.name}</strong>
+          <div className="node-header-text">
+            <strong>{zone.name}</strong>
+            <span className="zone-type-tag">{ZONE_TYPE_LABELS[zone.zoneType]}</span>
+          </div>
         </div>
         {onEnter && !readOnly ? (
           <button className="icon-button nodrag" title="Entrar a zona" onClick={() => onEnter(zone.id)}>
@@ -54,7 +57,10 @@ export function TableNodeView({ data, selected }: NodeProps<TableFlowNode>) {
         style={{ transform: `rotate(${table.rotation}deg)` }}
       >
         <strong>{table.name}</strong>
-        <span>{table.seats}</span>
+        <span className="seat-badge">
+          <Users size={12} />
+          {table.seats}
+        </span>
       </div>
     </div>
   );

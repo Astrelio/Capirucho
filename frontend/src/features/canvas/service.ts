@@ -1,13 +1,16 @@
 import { supabase } from '../../config/supabase';
-import type {
-  AvailabilityResult,
-  CanvasData,
-  ReservationSlot,
-  Restaurant,
-  RestaurantTable,
-  TableShape,
-  TableStatus,
-  Zone,
+import {
+  DEFAULT_CANVAS,
+  type AvailabilityResult,
+  type CanvasConfig,
+  type CanvasData,
+  type ReservationSlot,
+  type Restaurant,
+  type RestaurantTable,
+  type TableShape,
+  type TableStatus,
+  type Zone,
+  type ZoneType,
 } from './types';
 
 export const RESTAURANT_SLUG = 'el-capirucho';
@@ -35,6 +38,7 @@ export function slotEnd(time: string, minutes = SLOT_MINUTES) {
 
 type ZoneRow = {
   id: string; restaurant_id: string; name: string; color: string;
+  zone_type: string | null;
   position_x: number; position_y: number; width: number; height: number;
 };
 
@@ -46,11 +50,12 @@ type TableRow = {
 
 const zoneFromRow = (r: ZoneRow): Zone => ({
   id: r.id, restaurantId: r.restaurant_id, name: r.name, color: r.color,
+  zoneType: (r.zone_type as ZoneType | null) ?? 'comedor',
   x: r.position_x, y: r.position_y, width: r.width, height: r.height,
 });
 
 const zoneToRow = (z: Zone) => ({
-  id: z.id, name: z.name, color: z.color,
+  id: z.id, name: z.name, color: z.color, zone_type: z.zoneType,
   position_x: z.x, position_y: z.y, width: z.width, height: z.height,
 });
 
@@ -69,13 +74,39 @@ const tableToRow = (t: RestaurantTable) => ({
 
 // ---------- Lecturas (Supabase directo, RLS public read) ----------
 
-export async function loadCanvas(): Promise<CanvasData> {
-  const { data: rest, error: rErr } = await supabase
+type RestaurantRow = {
+  id: string; name: string; slug: string; description: string | null;
+  canvas_width_m: number | null; canvas_height_m: number | null;
+};
+
+/**
+ * Carga el restaurante. Si la migración de canvas aún no se aplicó
+ * (faltan columnas canvas_width_m/height_m), degrada a la selección básica
+ * en lugar de fallar, usando los valores por defecto del lienzo.
+ */
+async function fetchRestaurantRow(): Promise<RestaurantRow> {
+  const full = await supabase
+    .from('restaurants')
+    .select('id, name, slug, description, canvas_width_m, canvas_height_m')
+    .eq('slug', RESTAURANT_SLUG)
+    .single<RestaurantRow>();
+
+  if (!full.error && full.data) return full.data;
+
+  const basic = await supabase
     .from('restaurants')
     .select('id, name, slug, description')
     .eq('slug', RESTAURANT_SLUG)
-    .single();
-  if (rErr || !rest) throw new Error(rErr?.message ?? 'Restaurante no encontrado');
+    .single<Omit<RestaurantRow, 'canvas_width_m' | 'canvas_height_m'>>();
+
+  if (basic.error || !basic.data) {
+    throw new Error(basic.error?.message ?? full.error?.message ?? 'Restaurante no encontrado');
+  }
+  return { ...basic.data, canvas_width_m: null, canvas_height_m: null };
+}
+
+export async function loadCanvas(): Promise<CanvasData> {
+  const rest = await fetchRestaurantRow();
 
   const [{ data: zones, error: zErr }, { data: tables, error: tErr }] = await Promise.all([
     supabase.from('zones').select('*').eq('restaurant_id', rest.id).order('sort_order'),
@@ -84,8 +115,18 @@ export async function loadCanvas(): Promise<CanvasData> {
   if (zErr) throw new Error(zErr.message);
   if (tErr) throw new Error(tErr.message);
 
+  const canvas: CanvasConfig = {
+    widthM: rest.canvas_width_m ?? DEFAULT_CANVAS.widthM,
+    heightM: rest.canvas_height_m ?? DEFAULT_CANVAS.heightM,
+  };
+
+  const restaurant: Restaurant = {
+    id: rest.id, name: rest.name, slug: rest.slug, description: rest.description,
+  };
+
   return {
-    restaurant: rest as Restaurant,
+    restaurant,
+    canvas,
     zones: (zones as ZoneRow[]).map(zoneFromRow),
     tables: (tables as TableRow[]).map(tableFromRow),
   };
@@ -138,7 +179,13 @@ export function getAvailability(
 
 const FN = '/.netlify/functions';
 
-export async function saveLayout(restaurantId: string, zones?: Zone[], tables?: RestaurantTable[]) {
+export async function saveLayout(
+  restaurantId: string,
+  zones?: Zone[],
+  tables?: RestaurantTable[],
+  canvas?: CanvasConfig,
+  tableScopeZoneIds?: string[],
+) {
   const res = await fetch(`${FN}/layout`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -146,9 +193,11 @@ export async function saveLayout(restaurantId: string, zones?: Zone[], tables?: 
       restaurantId,
       zones: zones?.map(zoneToRow),
       tables: tables?.map(tableToRow),
+      canvas: canvas ? { width_m: canvas.widthM, height_m: canvas.heightM } : undefined,
+      tableScopeZoneIds,
     }),
   });
-  const body = await res.json();
+  const body = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }));
   if (!res.ok) throw new Error(body.error ?? 'Error guardando layout');
   return body;
 }
@@ -190,6 +239,8 @@ export async function reserveTable(input: {
 export function subscribeCanvas(onChange: () => void) {
   const channel = supabase
     .channel('canvas-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'restaurants' }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'zones' }, onChange)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'tables' }, onChange)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, onChange)
     .subscribe();

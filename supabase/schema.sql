@@ -15,6 +15,8 @@ create table if not exists restaurants (
   logo_url text,
   cover_url text,
   layout_json jsonb default '{}',
+  canvas_width_m numeric default 20,
+  canvas_height_m numeric default 15,
   created_at timestamptz default now()
 );
 
@@ -34,6 +36,7 @@ create table if not exists zones (
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   name text not null,
   color text default '#555555',
+  zone_type text default 'comedor' check (zone_type in ('comedor','cocina','baño','pista_baile','jardin','barra')),
   position_x float default 0,
   position_y float default 0,
   width float default 400,
@@ -48,12 +51,13 @@ create table if not exists tables (
   zone_id uuid not null references zones(id) on delete cascade,
   label text not null,
   seats int not null default 4,
-  shape text default 'square' check (shape in ('square','rectangle','circle')),
+  shape text default 'square' check (shape in ('round','square','rectangle','circle')),
   position_x float default 0,
   position_y float default 0,
   width float default 80,
   height float default 80,
   status text default 'available' check (status in ('available','occupied','reserved','blocked')),
+  rotation int default 0,
   created_at timestamptz default now()
 );
 
@@ -174,8 +178,33 @@ $$;
 
 -- ---------- REALTIME ----------
 
-alter publication supabase_realtime add table tables;
-alter publication supabase_realtime add table reservations;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and tablename = 'restaurants'
+  ) then
+    alter publication supabase_realtime add table restaurants;
+  end if;
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and tablename = 'zones'
+  ) then
+    alter publication supabase_realtime add table zones;
+  end if;
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and tablename = 'tables'
+  ) then
+    alter publication supabase_realtime add table tables;
+  end if;
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and tablename = 'reservations'
+  ) then
+    alter publication supabase_realtime add table reservations;
+  end if;
+end $$;
 
 -- ---------- SEED: restaurante demo ----------
 

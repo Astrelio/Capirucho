@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import ReservationPage from './pages/ReservationPage';
 import PublicCanvas from './features/canvas/PublicCanvas';
@@ -24,6 +24,7 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<ProtectedRoute allow={['admin', 'super_admin']} />}>
         <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="layout" replace />} />
           <Route path="layout" element={<AdminCanvas />} />
           <Route path="menu" element={<MenuManager />} />
           <Route path="reservations" element={<ReservationList />} />

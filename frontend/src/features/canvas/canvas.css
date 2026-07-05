@@ -163,11 +163,26 @@
 }
 
 .flow-frame {
+  position: relative;
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--outline-variant);
   border-radius: 8px;
   background: var(--surface-container-lowest);
+}
+
+.flow-empty {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--outline);
+  font-size: 15px;
+  font-weight: 700;
+  pointer-events: none;
+  text-align: center;
 }
 
 .zone-frame {
@@ -374,6 +389,12 @@
   gap: 9px;
 }
 
+.node-header-text {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
 .node-header strong {
   overflow: hidden;
   color: var(--on-surface);
@@ -381,6 +402,14 @@
   font-family: var(--font-body);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.zone-type-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--outline);
 }
 
 .color-swatch {
@@ -426,11 +455,14 @@
   color: inherit;
 }
 
-.table-node span {
-  display: grid;
-  width: 28px;
+.table-node .seat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 28px;
   height: 22px;
-  place-items: center;
+  padding: 0 7px;
+  justify-content: center;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.85);
   color: var(--on-surface);

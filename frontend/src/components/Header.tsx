@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { ADMIN_HOME, isAdminRole } from '../services/authService';
 
 const NAV = [
   { label: 'Story', to: '/#story' },
@@ -10,7 +11,8 @@ const NAV = [
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const { isAuthenticated, loading, session, signOut } = useAuth();
+  const { isAuthenticated, loading, role, roleLoading, session, signOut } = useAuth();
+  const canAccessAdmin = isAdminRole(role);
 
   const displayName =
     (session?.user?.user_metadata?.full_name as string | undefined) ??
@@ -43,6 +45,11 @@ export default function Header() {
           {loading ? null : isAuthenticated ? (
             <div className="home-session">
               <span className="home-session-name">{displayName}</span>
+              {!roleLoading && canAccessAdmin ? (
+                <Link to={ADMIN_HOME} className="btn btn-primary btn-sm">
+                  Administrar
+                </Link>
+              ) : null}
               <button
                 type="button"
                 className="btn btn-outline btn-sm"
