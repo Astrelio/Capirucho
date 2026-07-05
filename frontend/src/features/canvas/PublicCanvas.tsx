@@ -6,8 +6,12 @@ import '@xyflow/react/dist/style.css';
 import { ArrowLeft, CalendarDays, Check, Clock, Save, Users } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  getAvailability, loadCanvas, loadReservations, reserveTable, subscribeCanvas, timeSlots, todayInputValue,
+  getAvailability, loadCanvas, loadReservations, reserveTable, slotEnd, subscribeCanvas, timeSlots, todayInputValue,
 } from './service';
+import {
+  buildReservationUrls,
+  notifyReservationConfirmed,
+} from '../../services/n8nService';
 import type { CanvasData, ReservationSlot, Zone } from './types';
 import { nodeTypes, tableToNode, zoneToNode, type TableFlowNode, type ZoneFlowNode } from './nodes';
 import './canvas.css';
@@ -126,6 +130,7 @@ function PublicMicro({
     Number.isFinite(paramGuests) && paramGuests >= 1 ? paramGuests : 4,
   );
   const [guestName, setGuestName] = useState(params.get('name') ?? '');
+  const [guestEmail, setGuestEmail] = useState(params.get('email') ?? '');
   const [guestPhone, setGuestPhone] = useState(params.get('phone') ?? '');
   const notes = params.get('notes') ?? '';
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
@@ -169,13 +174,24 @@ function PublicMicro({
       onNotice('Selecciona una mesa');
       return;
     }
+    const name = guestName.trim();
+    const email = guestEmail.trim();
+    if (!name) {
+      onNotice('Ingresa tu nombre');
+      return;
+    }
+    if (!email || !email.includes('@')) {
+      onNotice('Ingresa un correo válido para recibir la confirmación');
+      return;
+    }
 
     setReserving(true);
     try {
       const result = await reserveTable({
         restaurantId: data.restaurant.id,
         tableId: selectedTableId,
-        guestName: guestName.trim() || 'Cliente',
+        guestName: name,
+        guestEmail: email,
         guestPhone: guestPhone.trim() || undefined,
         date,
         time,
@@ -189,9 +205,33 @@ function PublicMicro({
         return;
       }
 
+      const tableName = selectedAvailability?.table.name ?? 'Mesa';
+      const endTime = slotEnd(time);
+      const urls = buildReservationUrls(result.reservationId, email, date, time);
+
+      notifyReservationConfirmed({
+        event: 'reservation.confirmed',
+        reservationId: result.reservationId,
+        restaurantId: data.restaurant.id,
+        restaurantName: data.restaurant.name,
+        zoneName: zone.name,
+        tableName,
+        guestName: name,
+        guestEmail: email,
+        guestPhone: guestPhone.trim() || undefined,
+        date,
+        time,
+        timeEnd: endTime,
+        partySize,
+        notes: notes.trim() || undefined,
+        viewUrl: urls.viewUrl,
+        cancelUrl: urls.cancelUrl,
+      });
+
       setSelectedTableId(null);
       setGuestName('');
-      onNotice('Reserva confirmada');
+      setGuestEmail('');
+      onNotice('Reserva confirmada — revisa tu correo');
       refreshReservations();
     } finally {
       setReserving(false);
@@ -269,7 +309,17 @@ function PublicMicro({
         <div className="field-grid">
           <label>
             Cliente
-            <input value={guestName} onChange={(e) => setGuestName(e.target.value)} placeholder="Nombre" />
+            <input value={guestName} onChange={(e) => setGuestName(e.target.value)} placeholder="Nombre" required />
+          </label>
+          <label>
+            Correo
+            <input
+              type="email"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+              placeholder="tu@correo.com"
+              required
+            />
           </label>
           <label>
             Teléfono

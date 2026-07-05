@@ -51,3 +51,11 @@ skills/             # Skills de Cursor
 | waiter | Personal de piso (asignable) |
 | admin | Editar mapa (zonas/mesas), menú y reservaciones |
 | super_admin | Todo lo anterior + asignar roles en /admin/users |
+
+## n8n — email de confirmación
+
+Tras cada reserva exitosa la app llama tu webhook de n8n Cloud. Guía paso a paso (workflow Gmail + botones):
+
+→ [docs/n8n-reserva-gmail.md](docs/n8n-reserva-gmail.md)
+
+También ejecuta `supabase/004_cancel_reservation.sql` para el botón **Cancelar** del correo.

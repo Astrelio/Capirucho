@@ -11,6 +11,7 @@ export default function ReservationPage() {
   const [time, setTime] = useState('19:00');
   const [guests, setGuests] = useState('2');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -18,7 +19,7 @@ export default function ReservationPage() {
   // precarga esos datos y lleva al usuario directo al mapa.
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const params = new URLSearchParams({ date, time, guests, name, phone, notes });
+    const params = new URLSearchParams({ date, time, guests, name, email, phone, notes });
     navigate(`/reservar/mapa?${params.toString()}`);
   };
 
@@ -93,6 +94,18 @@ export default function ReservationPage() {
                   placeholder="Tu Nombre"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="rp-email">Correo</label>
+                <input
+                  id="rp-email"
+                  type="email"
+                  placeholder="tu@correo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>

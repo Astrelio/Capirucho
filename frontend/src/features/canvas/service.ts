@@ -274,6 +274,23 @@ export async function reserveTable(input: {
   return { ok: true as const, reservationId: data as string };
 }
 
+/** Cancela una reserva (desde el link del email). */
+export async function cancelReservation(reservationId: string, guestEmail?: string) {
+  const { error } = await supabase.rpc('cancel_reservation', {
+    p_reservation_id: reservationId,
+    p_guest_email: guestEmail ?? null,
+  });
+
+  if (error) {
+    const msg = error.message;
+    if (msg.includes('NOT_FOUND')) return { ok: false as const, message: 'Reserva no encontrada.' };
+    if (msg.includes('ALREADY_CANCELLED')) return { ok: false as const, message: 'Esta reserva ya fue cancelada.' };
+    if (msg.includes('FORBIDDEN')) return { ok: false as const, message: 'No pudimos verificar tu correo. Usa el enlace del email que recibiste.' };
+    return { ok: false as const, message: msg };
+  }
+  return { ok: true as const };
+}
+
 // ---------- Realtime ----------
 
 export function subscribeCanvas(onChange: () => void) {

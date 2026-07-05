@@ -1,6 +1,7 @@
 import { Navigate, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import ReservationPage from './pages/ReservationPage';
+import CancelReservationPage from './pages/CancelReservationPage';
 import PublicCanvas from './features/canvas/PublicCanvas';
 import MenuPage from './pages/MenuPage';
 import LoginPage from './features/auth/LoginPage';
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/reservar" element={<ReservationPage />} />
       <Route path="/reservar/mapa" element={<PublicCanvas />} />
+      <Route path="/reservar/cancelar" element={<CancelReservationPage />} />
       <Route path="/menu" element={<MenuPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
