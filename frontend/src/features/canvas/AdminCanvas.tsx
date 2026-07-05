@@ -5,14 +5,29 @@ import {
   MiniMap,
   ReactFlow,
   type NodeChange,
+  type NodeMouseHandler,
   type OnSelectionChangeParams,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import {
-  ArrowLeft, Check, DoorOpen, Lock, Plus, RefreshCcw, RotateCw, Save, Trash2,
+  ArrowLeft, Check, DoorOpen, Lock, Plus, RefreshCcw, RotateCw, Ruler, Save, Trash2,
 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import { isAdminRole } from '../../services/authService';
 import { createId, loadCanvas, saveLayout } from './service';
-import type { CanvasData, RestaurantTable, TableShape, Zone } from './types';
+import {
+  DEFAULT_CANVAS,
+  metersToPx,
+  pxToMeters,
+  TABLE_SHAPES,
+  ZONE_TYPES,
+  type CanvasConfig,
+  type CanvasData,
+  type RestaurantTable,
+  type TableShape,
+  type Zone,
+  type ZoneType,
+} from './types';
 import {
   nodeTypes, tableToNode, zoneToNode,
   type TableFlowNode, type ZoneFlowNode,
@@ -23,16 +38,22 @@ import './canvas.css';
 type AdminView = 'macro' | 'micro';
 
 export default function AdminCanvas() {
+  const { role } = useAuth();
+  // admin y super_admin pueden editar el mapa; otros roles solo lo ven.
+  const canEdit = isAdminRole(role);
+
   const [data, setData] = useState<CanvasData | null>(null);
   const [error, setError] = useState('');
   const [view, setView] = useState<AdminView>('macro');
   const [activeZoneId, setActiveZoneId] = useState('');
   const [notice, setNotice] = useState('');
+  const [canvasCfg, setCanvasCfg] = useState<CanvasConfig>(DEFAULT_CANVAS);
 
   const reload = useCallback(() => {
     loadCanvas()
       .then((d) => {
         setData(d);
+        setCanvasCfg(d.canvas);
         setActiveZoneId((cur) => (d.zones.some((z) => z.id === cur) ? cur : d.zones[0]?.id ?? ''));
       })
       .catch((e) => setError((e as Error).message));
@@ -46,6 +67,16 @@ export default function AdminCanvas() {
     return () => clearTimeout(t);
   }, [notice]);
 
+  const enterZone = useCallback((id: string) => {
+    setActiveZoneId(id);
+    setView('micro');
+  }, []);
+
+  const handleSaved = useCallback((msg: string) => {
+    setNotice(msg);
+    reload();
+  }, [reload]);
+
   if (error) return <div className="canvas-message error">Error: {error}</div>;
   if (!data) return <div className="canvas-message">Cargando layout…</div>;
 
@@ -57,24 +88,19 @@ export default function AdminCanvas() {
         <MicroAdmin
           data={data}
           zone={activeZone}
+          canEdit={canEdit}
           onBack={() => setView('macro')}
-          onSaved={(msg) => {
-            setNotice(msg);
-            reload();
-          }}
+          onSaved={handleSaved}
           onReload={reload}
         />
       ) : (
         <MacroAdmin
           data={data}
-          onEnterZone={(id) => {
-            setActiveZoneId(id);
-            setView('micro');
-          }}
-          onSaved={(msg) => {
-            setNotice(msg);
-            reload();
-          }}
+          canEdit={canEdit}
+          canvasCfg={canvasCfg}
+          onCanvasCfg={setCanvasCfg}
+          onEnterZone={enterZone}
+          onSaved={handleSaved}
           onReload={reload}
         />
       )}
@@ -90,21 +116,24 @@ export default function AdminCanvas() {
 }
 
 function MacroAdmin({
-  data, onEnterZone, onSaved, onReload,
+  data, canEdit, canvasCfg, onCanvasCfg, onEnterZone, onSaved, onReload,
 }: {
   data: CanvasData;
+  canEdit: boolean;
+  canvasCfg: CanvasConfig;
+  onCanvasCfg: (cfg: CanvasConfig) => void;
   onEnterZone: (zoneId: string) => void;
   onSaved: (msg: string) => void;
   onReload: () => void;
 }) {
-  const [nodes, setNodes] = useState<ZoneFlowNode[]>(() => data.zones.map((z) => zoneToNode(z, false, onEnterZone)));
+  const [nodes, setNodes] = useState<ZoneFlowNode[]>(() => data.zones.map((z) => zoneToNode(z, !canEdit, onEnterZone)));
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(data.zones[0]?.id ?? null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setNodes(data.zones.map((z) => zoneToNode(z, false, onEnterZone)));
+    setNodes(data.zones.map((z) => zoneToNode(z, !canEdit, onEnterZone)));
     setSelectedZoneId((cur) => (cur && data.zones.some((z) => z.id === cur) ? cur : data.zones[0]?.id ?? null));
-  }, [data.zones, onEnterZone]);
+  }, [data.zones, onEnterZone, canEdit]);
 
   const selectedZone = nodes.find((n) => n.id === selectedZoneId)?.data.zone;
 
@@ -115,6 +144,12 @@ function MacroAdmin({
   const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
     setSelectedZoneId(params.nodes[0]?.id ?? null);
   }, []);
+
+  // Sin permisos de edición: click en zona -> entrar (solo visualización).
+  const onNodeClick: NodeMouseHandler<ZoneFlowNode> = useCallback(
+    (_, node) => { if (!canEdit) onEnterZone(node.id); },
+    [canEdit, onEnterZone],
+  );
 
   const updateSelectedZone = (patch: Partial<Zone>) => {
     if (!selectedZoneId) return;
@@ -130,10 +165,11 @@ function MacroAdmin({
       restaurantId: data.restaurant.id,
       name: `Zona ${n}`,
       color: '#a03b28',
+      zoneType: 'comedor',
       x: 130 + n * 24,
       y: 110 + n * 18,
-      width: 280,
-      height: 210,
+      width: metersToPx(6),
+      height: metersToPx(4),
     };
     setNodes((cur) => [...cur.map((x) => ({ ...x, selected: false })), { ...zoneToNode(zone, false, onEnterZone), selected: true }]);
     setSelectedZoneId(zone.id);
@@ -152,7 +188,7 @@ function MacroAdmin({
           height: Math.round(readNodeDimension(node, 'height', zone.height)),
         };
       });
-      await saveLayout(data.restaurant.id, nextZones, undefined);
+      await saveLayout(data.restaurant.id, nextZones, undefined, canvasCfg);
       onSaved('Zonas guardadas');
     } catch (e) {
       onSaved(`Error: ${(e as Error).message}`);
@@ -169,13 +205,15 @@ function MacroAdmin({
             <span className="eyebrow">Macro canvas</span>
             <h1>Zonas del restaurante</h1>
           </div>
-          <div className="canvas-toolbar">
-            <button onClick={createZone}><Plus size={16} />Zona</button>
-            <button onClick={onReload}><RefreshCcw size={16} />Recargar</button>
-            <button className="primary" onClick={saveZones} disabled={saving}>
-              <Save size={16} />{saving ? 'Guardando…' : 'Guardar'}
-            </button>
-          </div>
+          {canEdit ? (
+            <div className="canvas-toolbar">
+              <button onClick={createZone}><Plus size={16} />Zona</button>
+              <button onClick={onReload}><RefreshCcw size={16} />Recargar</button>
+              <button className="primary" onClick={saveZones} disabled={saving}>
+                <Save size={16} />{saving ? 'Guardando…' : 'Guardar'}
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <div className="flow-frame">
@@ -185,82 +223,165 @@ function MacroAdmin({
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onSelectionChange={onSelectionChange}
+            onNodeClick={onNodeClick}
+            nodesDraggable={canEdit}
             minZoom={0.35}
             maxZoom={1.8}
             fitView
           >
-            <Background />
+            <Background gap={PX_GRID} />
             <Controls />
             <MiniMap pannable zoomable />
           </ReactFlow>
+          {nodes.length === 0 ? <div className="flow-empty">No hay zonas guardadas</div> : null}
         </div>
       </div>
 
-      <aside className="inspector">
-        <div className="inspector-title">
-          <span>Zona</span>
-          <strong>{selectedZone?.name ?? 'Sin selección'}</strong>
-        </div>
-
-        {selectedZone ? (
-          <div className="field-grid">
-            <label>
-              Nombre
-              <input value={selectedZone.name} onChange={(e) => updateSelectedZone({ name: e.target.value })} />
-            </label>
-            <label>
-              Color
-              <input type="color" value={selectedZone.color} onChange={(e) => updateSelectedZone({ color: e.target.value })} />
-            </label>
-            <div className="size-row">
-              <label>
-                Ancho
-                <input
-                  type="number" min={180}
-                  value={Math.round(readNodeDimension(nodes.find((n) => n.id === selectedZoneId), 'width', selectedZone.width))}
-                  onChange={(e) => updateNodeSize(setNodes, selectedZoneId, 'width', Number(e.target.value))}
-                />
-              </label>
-              <label>
-                Alto
-                <input
-                  type="number" min={150}
-                  value={Math.round(readNodeDimension(nodes.find((n) => n.id === selectedZoneId), 'height', selectedZone.height))}
-                  onChange={(e) => updateNodeSize(setNodes, selectedZoneId, 'height', Number(e.target.value))}
-                />
-              </label>
-            </div>
-            <button className="primary full" onClick={() => onEnterZone(selectedZone.id)}>
-              <DoorOpen size={16} />
-              Entrar a zona
-            </button>
-          </div>
-        ) : (
-          <div className="empty-panel">Selecciona una zona</div>
-        )}
-      </aside>
+      <ZoneInspector
+        canEdit={canEdit}
+        canvasCfg={canvasCfg}
+        onCanvasCfg={onCanvasCfg}
+        selectedZone={selectedZone}
+        selectedZoneId={selectedZoneId}
+        nodes={nodes}
+        setNodes={setNodes}
+        updateSelectedZone={updateSelectedZone}
+        onEnterZone={onEnterZone}
+      />
     </section>
   );
 }
 
+/** Panel de edición de zonas + config del lienzo. Solo roles admin. */
+function ZoneInspector({
+  canEdit, canvasCfg, onCanvasCfg, selectedZone, selectedZoneId, nodes, setNodes, updateSelectedZone, onEnterZone,
+}: {
+  canEdit: boolean;
+  canvasCfg: CanvasConfig;
+  onCanvasCfg: (cfg: CanvasConfig) => void;
+  selectedZone: Zone | undefined;
+  selectedZoneId: string | null;
+  nodes: ZoneFlowNode[];
+  setNodes: React.Dispatch<React.SetStateAction<ZoneFlowNode[]>>;
+  updateSelectedZone: (patch: Partial<Zone>) => void;
+  onEnterZone: (zoneId: string) => void;
+}) {
+  if (!canEdit) return null;
+
+  const wPx = selectedZone
+    ? readNodeDimension(nodes.find((n) => n.id === selectedZoneId), 'width', selectedZone.width)
+    : 0;
+  const hPx = selectedZone
+    ? readNodeDimension(nodes.find((n) => n.id === selectedZoneId), 'height', selectedZone.height)
+    : 0;
+
+  return (
+    <aside className="inspector">
+      <div className="inspector-title">
+        <span><Ruler size={12} /> Terreno (metros)</span>
+        <strong>{canvasCfg.widthM} × {canvasCfg.heightM} m</strong>
+      </div>
+
+      <div className="field-grid" style={{ marginBottom: 18 }}>
+        <div className="size-row">
+          <label>
+            Ancho total (m)
+            <input
+              type="number" min={1} step={0.5}
+              value={canvasCfg.widthM}
+              onChange={(e) => onCanvasCfg({ ...canvasCfg, widthM: Number(e.target.value) })}
+            />
+          </label>
+          <label>
+            Largo total (m)
+            <input
+              type="number" min={1} step={0.5}
+              value={canvasCfg.heightM}
+              onChange={(e) => onCanvasCfg({ ...canvasCfg, heightM: Number(e.target.value) })}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="inspector-title">
+        <span>Zona</span>
+        <strong>{selectedZone?.name ?? 'Sin selección'}</strong>
+      </div>
+
+      {selectedZone ? (
+        <div className="field-grid">
+          <label>
+            Nombre
+            <input value={selectedZone.name} onChange={(e) => updateSelectedZone({ name: e.target.value })} />
+          </label>
+          <label>
+            Tipo de zona
+            <select
+              value={selectedZone.zoneType}
+              onChange={(e) => {
+                const zoneType = e.target.value as ZoneType;
+                const preset = ZONE_TYPES.find((z) => z.value === zoneType);
+                updateSelectedZone({ zoneType, ...(preset ? { color: preset.color } : {}) });
+              }}
+            >
+              {ZONE_TYPES.map((z) => (
+                <option key={z.value} value={z.value}>{z.label}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Color
+            <input type="color" value={selectedZone.color} onChange={(e) => updateSelectedZone({ color: e.target.value })} />
+          </label>
+          <div className="size-row">
+            <label>
+              Ancho (m)
+              <input
+                type="number" min={1} step={0.5}
+                value={pxToMeters(wPx)}
+                onChange={(e) => updateNodeSize(setNodes, selectedZoneId, 'width', metersToPx(Number(e.target.value)))}
+              />
+            </label>
+            <label>
+              Largo (m)
+              <input
+                type="number" min={1} step={0.5}
+                value={pxToMeters(hPx)}
+                onChange={(e) => updateNodeSize(setNodes, selectedZoneId, 'height', metersToPx(Number(e.target.value)))}
+              />
+            </label>
+          </div>
+          <button className="primary full" onClick={() => onEnterZone(selectedZone.id)}>
+            <DoorOpen size={16} />
+            Entrar a zona
+          </button>
+        </div>
+      ) : (
+        <div className="empty-panel">Selecciona una zona</div>
+      )}
+    </aside>
+  );
+}
+
 function MicroAdmin({
-  data, zone, onBack, onSaved, onReload,
+  data, zone, canEdit, onBack, onSaved, onReload,
 }: {
   data: CanvasData;
   zone: Zone;
+  canEdit: boolean;
   onBack: () => void;
   onSaved: (msg: string) => void;
   onReload: () => void;
 }) {
   const zoneTables = useMemo(() => data.tables.filter((t) => t.zoneId === zone.id), [data.tables, zone.id]);
-  const [nodes, setNodes] = useState<TableFlowNode[]>(() => zoneTables.map((t) => tableToNode(t, zone.name, false)));
+  const [nodes, setNodes] = useState<TableFlowNode[]>(() => zoneTables.map((t) => tableToNode(t, zone.name, !canEdit)));
   const [selectedTableId, setSelectedTableId] = useState<string | null>(zoneTables[0]?.id ?? null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setNodes(zoneTables.map((t) => tableToNode(t, zone.name, false)));
+    setNodes(zoneTables.map((t) => tableToNode(t, zone.name, !canEdit)));
     setSelectedTableId((cur) => (cur && zoneTables.some((t) => t.id === cur) ? cur : zoneTables[0]?.id ?? null));
-  }, [zone.name, zoneTables]);
+  }, [zone.name, zoneTables, canEdit]);
 
   const selectedTable = nodes.find((n) => n.id === selectedTableId)?.data.table;
 
@@ -288,8 +409,8 @@ function MicroAdmin({
       name: `M${n}`,
       x: 120 + n * 18,
       y: 120 + n * 18,
-      width: 112,
-      height: 112,
+      width: metersToPx(1.2),
+      height: metersToPx(1.2),
       shape: 'round',
       seats: 4,
       rotation: 0,
@@ -318,7 +439,7 @@ function MicroAdmin({
           height: Math.round(readNodeDimension(node, 'height', table.height)),
         };
       });
-      await saveLayout(data.restaurant.id, undefined, nextTables);
+      await saveLayout(data.restaurant.id, undefined, nextTables, undefined, [zone.id]);
       onSaved('Mesas guardadas');
     } catch (e) {
       onSaved(`Error: ${(e as Error).message}`);
@@ -326,6 +447,13 @@ function MicroAdmin({
       setSaving(false);
     }
   };
+
+  const wPx = selectedTable
+    ? readNodeDimension(nodes.find((n) => n.id === selectedTableId), 'width', selectedTable.width)
+    : 0;
+  const hPx = selectedTable
+    ? readNodeDimension(nodes.find((n) => n.id === selectedTableId), 'height', selectedTable.height)
+    : 0;
 
   return (
     <section className="canvas-layout">
@@ -337,11 +465,15 @@ function MicroAdmin({
           </div>
           <div className="canvas-toolbar">
             <button onClick={onBack}><ArrowLeft size={16} />Zonas</button>
-            <button onClick={createTable}><Plus size={16} />Mesa</button>
-            <button onClick={onReload}><RefreshCcw size={16} />Recargar</button>
-            <button className="primary" onClick={saveTables} disabled={saving}>
-              <Save size={16} />{saving ? 'Guardando…' : 'Guardar'}
-            </button>
+            {canEdit ? (
+              <>
+                <button onClick={createTable}><Plus size={16} />Mesa</button>
+                <button onClick={onReload}><RefreshCcw size={16} />Recargar</button>
+                <button className="primary" onClick={saveTables} disabled={saving}>
+                  <Save size={16} />{saving ? 'Guardando…' : 'Guardar'}
+                </button>
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -352,95 +484,127 @@ function MicroAdmin({
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onSelectionChange={onSelectionChange}
+            nodesDraggable={canEdit}
             minZoom={0.35}
             maxZoom={2}
             fitView
           >
-            <Background />
+            <Background gap={PX_GRID} />
             <Controls />
             <MiniMap pannable zoomable />
           </ReactFlow>
+          {nodes.length === 0 ? <div className="flow-empty">No hay mesas en esta zona</div> : null}
         </div>
       </div>
 
-      <aside className="inspector">
-        <div className="inspector-title">
-          <span>Mesa</span>
-          <strong>{selectedTable?.name ?? 'Sin selección'}</strong>
-        </div>
-
-        {selectedTable ? (
-          <div className="field-grid">
-            <label>
-              Nombre
-              <input value={selectedTable.name} onChange={(e) => updateSelectedTable({ name: e.target.value })} />
-            </label>
-            <div className="size-row">
-              <label>
-                Sillas
-                <input
-                  type="number" min={1} max={20}
-                  value={selectedTable.seats}
-                  onChange={(e) => updateSelectedTable({ seats: Number(e.target.value) })}
-                />
-              </label>
-              <label>
-                Forma
-                <select value={selectedTable.shape} onChange={(e) => updateSelectedTable({ shape: e.target.value as TableShape })}>
-                  <option value="round">Redonda</option>
-                  <option value="square">Cuadrada</option>
-                  <option value="rectangle">Rectangular</option>
-                  <option value="booth">Booth</option>
-                </select>
-              </label>
-            </div>
-            <div className="size-row">
-              <label>
-                Ancho
-                <input
-                  type="number" min={70}
-                  value={Math.round(readNodeDimension(nodes.find((n) => n.id === selectedTableId), 'width', selectedTable.width))}
-                  onChange={(e) => updateNodeSize(setNodes, selectedTableId, 'width', Number(e.target.value))}
-                />
-              </label>
-              <label>
-                Alto
-                <input
-                  type="number" min={70}
-                  value={Math.round(readNodeDimension(nodes.find((n) => n.id === selectedTableId), 'height', selectedTable.height))}
-                  onChange={(e) => updateNodeSize(setNodes, selectedTableId, 'height', Number(e.target.value))}
-                />
-              </label>
-            </div>
-            <label>
-              Rotación
-              <input
-                type="range" min={0} max={345} step={15}
-                value={selectedTable.rotation}
-                onChange={(e) => updateSelectedTable({ rotation: Number(e.target.value) })}
-              />
-            </label>
-            <button className="ghost" onClick={() => updateSelectedTable({ rotation: (selectedTable.rotation + 15) % 360 })}>
-              <RotateCw size={16} />
-              {selectedTable.rotation} grados
-            </button>
-            <label className="check-row">
-              <input
-                type="checkbox"
-                checked={selectedTable.status === 'blocked'}
-                onChange={(e) => updateSelectedTable({ status: e.target.checked ? 'blocked' : 'available' })}
-              />
-              <span><Lock size={15} />Bloqueada</span>
-            </label>
-            <button className="danger full" onClick={deleteSelectedTable}>
-              <Trash2 size={16} />
-              Eliminar mesa
-            </button>
-          </div>
-        ) : (
-          <div className="empty-panel">Selecciona una mesa</div>
-        )}
-      </aside>
+      <TableInspector
+        canEdit={canEdit}
+        selectedTable={selectedTable}
+        widthM={pxToMeters(wPx)}
+        heightM={pxToMeters(hPx)}
+        selectedTableId={selectedTableId}
+        setNodes={setNodes}
+        updateSelectedTable={updateSelectedTable}
+        deleteSelectedTable={deleteSelectedTable}
+      />
     </section>
   );
 }
+
+/** Panel de edición de mesas. Solo roles admin. */
+function TableInspector({
+  canEdit, selectedTable, widthM, heightM, selectedTableId, setNodes, updateSelectedTable, deleteSelectedTable,
+}: {
+  canEdit: boolean;
+  selectedTable: RestaurantTable | undefined;
+  widthM: number;
+  heightM: number;
+  selectedTableId: string | null;
+  setNodes: React.Dispatch<React.SetStateAction<TableFlowNode[]>>;
+  updateSelectedTable: (patch: Partial<RestaurantTable>) => void;
+  deleteSelectedTable: () => void;
+}) {
+  if (!canEdit) return null;
+
+  return (
+    <aside className="inspector">
+      <div className="inspector-title">
+        <span>Mesa</span>
+        <strong>{selectedTable?.name ?? 'Sin selección'}</strong>
+      </div>
+
+      {selectedTable ? (
+        <div className="field-grid">
+          <label>
+            Nombre
+            <input value={selectedTable.name} onChange={(e) => updateSelectedTable({ name: e.target.value })} />
+          </label>
+          <div className="size-row">
+            <label>
+              Sillas
+              <input
+                type="number" min={1} max={20}
+                value={selectedTable.seats}
+                onChange={(e) => updateSelectedTable({ seats: Number(e.target.value) })}
+              />
+            </label>
+            <label>
+              Forma
+              <select value={selectedTable.shape} onChange={(e) => updateSelectedTable({ shape: e.target.value as TableShape })}>
+                {TABLE_SHAPES.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="size-row">
+            <label>
+              Ancho (m)
+              <input
+                type="number" min={0.5} step={0.1}
+                value={widthM}
+                onChange={(e) => updateNodeSize(setNodes, selectedTableId, 'width', metersToPx(Number(e.target.value)))}
+              />
+            </label>
+            <label>
+              Largo (m)
+              <input
+                type="number" min={0.5} step={0.1}
+                value={heightM}
+                onChange={(e) => updateNodeSize(setNodes, selectedTableId, 'height', metersToPx(Number(e.target.value)))}
+              />
+            </label>
+          </div>
+          <label>
+            Rotación
+            <input
+              type="range" min={0} max={345} step={15}
+              value={selectedTable.rotation}
+              onChange={(e) => updateSelectedTable({ rotation: Number(e.target.value) })}
+            />
+          </label>
+          <button className="ghost" onClick={() => updateSelectedTable({ rotation: (selectedTable.rotation + 15) % 360 })}>
+            <RotateCw size={16} />
+            {selectedTable.rotation} grados
+          </button>
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={selectedTable.status === 'blocked'}
+              onChange={(e) => updateSelectedTable({ status: e.target.checked ? 'blocked' : 'available' })}
+            />
+            <span><Lock size={15} />Bloqueada</span>
+          </label>
+          <button className="danger full" onClick={deleteSelectedTable}>
+            <Trash2 size={16} />
+            Eliminar mesa
+          </button>
+        </div>
+      ) : (
+        <div className="empty-panel">Selecciona una mesa</div>
+      )}
+    </aside>
+  );
+}
+
+const PX_GRID = 25;

@@ -71,6 +71,23 @@
   display: none;
 }
 
+.home-session {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-session-name {
+  font-size: 14px;
+  color: var(--primary);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .home-burger {
   display: inline-flex;
   color: var(--primary);
@@ -78,6 +95,41 @@
   border: none;
   cursor: pointer;
   padding: 8px;
+}
+
+/* Menú móvil desplegable (botón hamburguesa) */
+.home-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 8px var(--margin-mobile, 20px) 20px;
+  background: var(--surface, #fffdfa);
+  border-bottom: 1px solid var(--outline-variant, #d8cdc0);
+}
+
+.home-mobile-nav a,
+.home-mobile-nav button {
+  padding: 14px 4px;
+  color: var(--on-surface, #2c241d);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--outline-variant, #e5dcd1);
+  cursor: pointer;
+}
+
+.home-mobile-nav a:last-child,
+.home-mobile-nav button:last-child {
+  border-bottom: none;
+}
+
+@media (min-width: 768px) {
+  .home-mobile-nav {
+    display: none;
+  }
 }
 
 @media (min-width: 768px) {

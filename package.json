@@ -3,15 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "netlify dev",
+    "dev": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",
-    "typecheck": "tsc --noEmit -p netlify && npm run typecheck --prefix frontend"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+    "typecheck": "npm run typecheck --prefix frontend"
   },
   "devDependencies": {
-    "@netlify/functions": "^2.8.0",
     "@types/node": "^26.1.0",
     "typescript": "^5.5.0"
   }

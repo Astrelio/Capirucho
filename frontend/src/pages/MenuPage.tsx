@@ -1,10 +1,42 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import DishCard from '../components/DishCard';
-import { dishes } from '../data/dishes';
+import { dishes as fallbackDishes, type Dish } from '../data/dishes';
+import { useMenu } from '../hooks/useMenu';
+import { menuItemToDish } from '../services/menuService';
 import '../components/home.css';
 
+interface MenuGroup {
+  category: string;
+  dishes: Dish[];
+}
+
 export default function MenuPage() {
+  const { menu, loading } = useMenu();
+
+  let groups: MenuGroup[];
+  if (menu && menu.items.length > 0) {
+    const orderedCategories = [
+      ...menu.categories,
+      { id: null as string | null, name: 'Especiales', sortOrder: Number.MAX_SAFE_INTEGER },
+    ];
+    groups = orderedCategories
+      .map((cat) => ({
+        category: cat.name,
+        dishes: menu.items
+          .filter((i) => i.categoryId === cat.id)
+          .map((i) => menuItemToDish(i, menu.categories)),
+      }))
+      .filter((g) => g.dishes.length > 0);
+  } else {
+    // Fallback estático si la BD aún no tiene menú
+    const categories = [...new Set(fallbackDishes.map((d) => d.category))];
+    groups = categories.map((category) => ({
+      category,
+      dishes: fallbackDishes.filter((d) => d.category === category),
+    }));
+  }
+
   return (
     <div className="fade-in">
       <Header />
@@ -23,17 +55,32 @@ export default function MenuPage() {
             técnicas cocinadas a fuego lento. Descubre nuestra selección completa.
           </p>
 
-          <div className="menu-page-grid" style={{ marginTop: 'var(--section-gap)' }}>
-            {dishes.map((dish, i) => (
-              <DishCard
-                key={dish.name}
-                dish={dish}
-                showCategory
-                className="stagger-item"
-                style={{ animationDelay: `${i * 0.12}s` }}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <p className="body-lg" style={{ marginTop: 'var(--section-gap)', color: 'var(--on-surface-variant)' }}>
+              Cargando menú…
+            </p>
+          ) : (
+            groups.map((group) => (
+              <div key={group.category} style={{ marginTop: 'var(--section-gap)' }}>
+                <h2
+                  className="headline-md"
+                  style={{ color: 'var(--secondary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}
+                >
+                  {group.category}
+                </h2>
+                <div className="menu-page-grid" style={{ marginTop: 'var(--stack-lg)' }}>
+                  {group.dishes.map((dish, i) => (
+                    <DishCard
+                      key={dish.name}
+                      dish={dish}
+                      className="stagger-item"
+                      style={{ animationDelay: `${i * 0.12}s` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
         </section>
       </main>
       <Footer />
