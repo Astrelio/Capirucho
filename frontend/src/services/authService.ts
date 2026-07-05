@@ -86,7 +86,8 @@ export function isAdminRole(role: UserRole | null): boolean {
 /** Rutas destino tras login según el rol (redirección inteligente). */
 export const ADMIN_HOME = '/admin/layout';
 export const PUBLIC_MAP = '/reservar/mapa';
+export const CUSTOMER_HOME = '/';
 
 export function roleHomePath(role: UserRole | null): string {
-  return isAdminRole(role) ? ADMIN_HOME : PUBLIC_MAP;
+  return isAdminRole(role) ? ADMIN_HOME : CUSTOMER_HOME;
 }

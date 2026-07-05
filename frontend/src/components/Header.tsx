@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const NAV = [
   { label: 'Story', to: '/#story' },
@@ -9,6 +10,12 @@ const NAV = [
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const { isAuthenticated, loading, session, signOut } = useAuth();
+
+  const displayName =
+    (session?.user?.user_metadata?.full_name as string | undefined) ??
+    session?.user?.email ??
+    'Mi cuenta';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -33,9 +40,22 @@ export default function Header() {
         </nav>
 
         <div className="home-cta-desktop">
-          <Link to="/login" className="btn btn-outline btn-sm">
-            Iniciar Sesión
-          </Link>
+          {loading ? null : isAuthenticated ? (
+            <div className="home-session">
+              <span className="home-session-name">{displayName}</span>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => void signOut()}
+              >
+                Cerrar Sesión
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-outline btn-sm">
+              Iniciar Sesión
+            </Link>
+          )}
         </div>
 
         <button className="home-burger" type="button" aria-label="Abrir menú">

@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { roleHomePath } from '../../services/authService';
 import type { AuthView } from './types';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
@@ -26,7 +28,13 @@ const MEDIA: Record<AuthView, { image: string; quote: string }> = {
 
 export default function AuthPage({ initialView = 'login' }: { initialView?: AuthView }) {
   const [view, setView] = useState<AuthView>(initialView);
+  const { isAuthenticated, loading, role } = useAuth();
   const media = MEDIA[view];
+
+  // Sesión ya activa -> no mostrar login de nuevo.
+  if (!loading && isAuthenticated) {
+    return <Navigate to={roleHomePath(role)} replace />;
+  }
 
   return (
     <div className="auth-shell">

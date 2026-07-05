@@ -71,6 +71,21 @@
   display: none;
 }
 
+.home-session {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-session-name {
+  font-size: 14px;
+  color: var(--primary);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .home-burger {
   display: inline-flex;
   color: var(--primary);
