@@ -175,10 +175,30 @@ export function getAvailability(
     });
 }
 
-// ---------- Escrituras (Netlify Functions, service role) ----------
+// ---------- Escrituras (Supabase directo; RLS valida el rol del usuario) ----------
 
-const FN = '/.netlify/functions';
+/** Traduce errores crudos de Supabase a mensajes útiles. */
+function friendlyDbError(message: string): string {
+  if (/row-level security/i.test(message)) {
+    return 'No tienes permisos para guardar. Inicia sesión con una cuenta admin o super_admin.';
+  }
+  return message;
+}
 
+async function deleteStale(table: 'zones' | 'tables', restaurantId: string, keepIds: string[], zoneScope?: string[]) {
+  let query = supabase.from(table).delete().eq('restaurant_id', restaurantId);
+  if (zoneScope && zoneScope.length > 0) query = query.in('zone_id', zoneScope);
+  if (keepIds.length > 0) query = query.not('id', 'in', `(${keepIds.join(',')})`);
+  const { error } = await query;
+  if (error) throw new Error(friendlyDbError(error.message));
+}
+
+/**
+ * Guarda el layout escribiendo directo a Supabase con la sesión del usuario.
+ * Las políticas RLS (003_roles_permissions.sql) exigen rol admin/super_admin.
+ * - zones: reemplaza el macro layout completo del restaurante.
+ * - tables: reemplaza solo las mesas de las zonas en tableScopeZoneIds.
+ */
 export async function saveLayout(
   restaurantId: string,
   zones?: Zone[],
@@ -186,20 +206,36 @@ export async function saveLayout(
   canvas?: CanvasConfig,
   tableScopeZoneIds?: string[],
 ) {
-  const res = await fetch(`${FN}/layout`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      restaurantId,
-      zones: zones?.map(zoneToRow),
-      tables: tables?.map(tableToRow),
-      canvas: canvas ? { width_m: canvas.widthM, height_m: canvas.heightM } : undefined,
-      tableScopeZoneIds,
-    }),
-  });
-  const body = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }));
-  if (!res.ok) throw new Error(body.error ?? 'Error guardando layout');
-  return body;
+  if (canvas) {
+    const { error } = await supabase
+      .from('restaurants')
+      .update({ canvas_width_m: canvas.widthM, canvas_height_m: canvas.heightM })
+      .eq('id', restaurantId);
+    if (error) throw new Error(friendlyDbError(error.message));
+  }
+
+  if (zones) {
+    if (zones.length > 0) {
+      const rows = zones.map((z, i) => ({ ...zoneToRow(z), restaurant_id: restaurantId, sort_order: i }));
+      const { error } = await supabase.from('zones').upsert(rows);
+      if (error) throw new Error(friendlyDbError(error.message));
+    }
+    await deleteStale('zones', restaurantId, zones.map((z) => z.id));
+  }
+
+  if (tables) {
+    if (tables.length > 0) {
+      const rows = tables.map((t) => ({ ...tableToRow(t), restaurant_id: restaurantId }));
+      const { error } = await supabase.from('tables').upsert(rows);
+      if (error) throw new Error(friendlyDbError(error.message));
+    }
+    const scope = tableScopeZoneIds ?? [...new Set(tables.map((t) => t.zoneId))];
+    if (scope.length > 0) {
+      await deleteStale('tables', restaurantId, tables.map((t) => t.id), scope);
+    }
+  }
+
+  return { ok: true };
 }
 
 export async function reserveTable(input: {
@@ -213,25 +249,29 @@ export async function reserveTable(input: {
   partySize: number;
   notes?: string;
 }) {
-  const res = await fetch(`${FN}/reserve`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      restaurantId: input.restaurantId,
-      tableId: input.tableId,
-      guestName: input.guestName,
-      guestEmail: input.guestEmail,
-      guestPhone: input.guestPhone,
-      date: input.date,
-      timeStart: input.time,
-      timeEnd: slotEnd(input.time),
-      partySize: input.partySize,
-      notes: input.notes,
-    }),
+  const { data: session } = await supabase.auth.getSession();
+
+  const { data, error } = await supabase.rpc('atomic_reserve', {
+    p_restaurant_id: input.restaurantId,
+    p_table_id: input.tableId,
+    p_user_id: session.session?.user?.id ?? null,
+    p_guest_name: input.guestName,
+    p_guest_email: input.guestEmail ?? null,
+    p_guest_phone: input.guestPhone ?? null,
+    p_date: input.date,
+    p_time_start: input.time,
+    p_time_end: slotEnd(input.time),
+    p_party_size: input.partySize,
+    p_notes: input.notes ?? null,
   });
-  const body = await res.json();
-  if (!res.ok) return { ok: false as const, message: body.error ?? 'Error al reservar' };
-  return { ok: true as const, reservationId: body.reservationId as string };
+
+  if (error) {
+    const message = error.message.includes('COLLISION')
+      ? 'Esa mesa ya está reservada en ese horario. Elige otra hora o mesa.'
+      : error.message;
+    return { ok: false as const, message };
+  }
+  return { ok: true as const, reservationId: data as string };
 }
 
 // ---------- Realtime ----------

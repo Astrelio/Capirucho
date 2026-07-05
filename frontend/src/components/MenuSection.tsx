@@ -1,11 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useInView } from '../hooks/useInView';
-import { dishes } from '../data/dishes';
+import { useMenu } from '../hooks/useMenu';
+import { menuItemToDish } from '../services/menuService';
+import { dishes as fallbackDishes } from '../data/dishes';
 import DishCard from './DishCard';
 
 export default function MenuSection() {
   const { ref, inView } = useInView<HTMLElement>();
-  const destacados = dishes.slice(1, 3);
+  const { menu } = useMenu();
+
+  const destacados =
+    menu && menu.items.length >= 2
+      ? menu.items.slice(0, 2).map((i) => menuItemToDish(i, menu.categories))
+      : fallbackDishes.slice(1, 3);
 
   return (
     <section

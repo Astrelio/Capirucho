@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ADMIN_HOME, isAdminRole } from '../services/authService';
 
@@ -11,7 +11,9 @@ const NAV = [
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, loading, role, roleLoading, session, signOut } = useAuth();
+  const location = useLocation();
   const canAccessAdmin = isAdminRole(role);
 
   const displayName =
@@ -26,8 +28,13 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Cierra el menú móvil al navegar a otra ruta.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname, location.hash]);
+
   return (
-    <header className={`home-header${scrolled ? ' home-header--scrolled' : ''}`}>
+    <header className={`home-header${scrolled || menuOpen ? ' home-header--scrolled' : ''}`}>
       <div className="home-header-inner">
         <Link to="/" className="home-logo">
           El Capirucho
@@ -65,14 +72,59 @@ export default function Header() {
           )}
         </div>
 
-        <button className="home-burger" type="button" aria-label="Abrir menú">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
+        <button
+          className="home-burger"
+          type="button"
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="5" y1="5" x2="19" y2="19" />
+              <line x1="19" y1="5" x2="5" y2="19" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          )}
         </button>
       </div>
+
+      {menuOpen ? (
+        <nav className="home-mobile-nav">
+          {NAV.map((item) => (
+            <Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)}>
+              {item.label}
+            </Link>
+          ))}
+          {loading ? null : isAuthenticated ? (
+            <>
+              {!roleLoading && canAccessAdmin ? (
+                <Link to={ADMIN_HOME} onClick={() => setMenuOpen(false)}>
+                  Administrar
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  void signOut();
+                }}
+              >
+                Cerrar Sesión
+              </button>
+            </>
+          ) : (
+            <Link to="/login" onClick={() => setMenuOpen(false)}>
+              Iniciar Sesión
+            </Link>
+          )}
+        </nav>
+      ) : null}
     </header>
   );
 }

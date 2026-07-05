@@ -7,9 +7,5 @@ export default defineConfig({
 
   server: {
     port: 5173,
-    proxy: {
-      // netlify dev sirve functions en 8888
-      '/.netlify/functions': 'http://localhost:8888',
-    },
   },
 });

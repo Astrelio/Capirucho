@@ -13,6 +13,7 @@ import {
   ArrowLeft, Check, DoorOpen, Lock, Plus, RefreshCcw, RotateCw, Ruler, Save, Trash2,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { isAdminRole } from '../../services/authService';
 import { createId, loadCanvas, saveLayout } from './service';
 import {
   DEFAULT_CANVAS,
@@ -38,7 +39,8 @@ type AdminView = 'macro' | 'micro';
 
 export default function AdminCanvas() {
   const { role } = useAuth();
-  const isSuper = role === 'super_admin';
+  // admin y super_admin pueden editar el mapa; otros roles solo lo ven.
+  const canEdit = isAdminRole(role);
 
   const [data, setData] = useState<CanvasData | null>(null);
   const [error, setError] = useState('');
@@ -86,7 +88,7 @@ export default function AdminCanvas() {
         <MicroAdmin
           data={data}
           zone={activeZone}
-          isSuper={isSuper}
+          canEdit={canEdit}
           onBack={() => setView('macro')}
           onSaved={handleSaved}
           onReload={reload}
@@ -94,7 +96,7 @@ export default function AdminCanvas() {
       ) : (
         <MacroAdmin
           data={data}
-          isSuper={isSuper}
+          canEdit={canEdit}
           canvasCfg={canvasCfg}
           onCanvasCfg={setCanvasCfg}
           onEnterZone={enterZone}
@@ -114,24 +116,24 @@ export default function AdminCanvas() {
 }
 
 function MacroAdmin({
-  data, isSuper, canvasCfg, onCanvasCfg, onEnterZone, onSaved, onReload,
+  data, canEdit, canvasCfg, onCanvasCfg, onEnterZone, onSaved, onReload,
 }: {
   data: CanvasData;
-  isSuper: boolean;
+  canEdit: boolean;
   canvasCfg: CanvasConfig;
   onCanvasCfg: (cfg: CanvasConfig) => void;
   onEnterZone: (zoneId: string) => void;
   onSaved: (msg: string) => void;
   onReload: () => void;
 }) {
-  const [nodes, setNodes] = useState<ZoneFlowNode[]>(() => data.zones.map((z) => zoneToNode(z, !isSuper, onEnterZone)));
+  const [nodes, setNodes] = useState<ZoneFlowNode[]>(() => data.zones.map((z) => zoneToNode(z, !canEdit, onEnterZone)));
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(data.zones[0]?.id ?? null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setNodes(data.zones.map((z) => zoneToNode(z, !isSuper, onEnterZone)));
+    setNodes(data.zones.map((z) => zoneToNode(z, !canEdit, onEnterZone)));
     setSelectedZoneId((cur) => (cur && data.zones.some((z) => z.id === cur) ? cur : data.zones[0]?.id ?? null));
-  }, [data.zones, onEnterZone, isSuper]);
+  }, [data.zones, onEnterZone, canEdit]);
 
   const selectedZone = nodes.find((n) => n.id === selectedZoneId)?.data.zone;
 
@@ -145,8 +147,8 @@ function MacroAdmin({
 
   // Sin permisos de edición: click en zona -> entrar (solo visualización).
   const onNodeClick: NodeMouseHandler<ZoneFlowNode> = useCallback(
-    (_, node) => { if (!isSuper) onEnterZone(node.id); },
-    [isSuper, onEnterZone],
+    (_, node) => { if (!canEdit) onEnterZone(node.id); },
+    [canEdit, onEnterZone],
   );
 
   const updateSelectedZone = (patch: Partial<Zone>) => {
@@ -203,7 +205,7 @@ function MacroAdmin({
             <span className="eyebrow">Macro canvas</span>
             <h1>Zonas del restaurante</h1>
           </div>
-          {isSuper ? (
+          {canEdit ? (
             <div className="canvas-toolbar">
               <button onClick={createZone}><Plus size={16} />Zona</button>
               <button onClick={onReload}><RefreshCcw size={16} />Recargar</button>
@@ -222,7 +224,7 @@ function MacroAdmin({
             onNodesChange={onNodesChange}
             onSelectionChange={onSelectionChange}
             onNodeClick={onNodeClick}
-            nodesDraggable={isSuper}
+            nodesDraggable={canEdit}
             minZoom={0.35}
             maxZoom={1.8}
             fitView
@@ -236,7 +238,7 @@ function MacroAdmin({
       </div>
 
       <ZoneInspector
-        isSuper={isSuper}
+        canEdit={canEdit}
         canvasCfg={canvasCfg}
         onCanvasCfg={onCanvasCfg}
         selectedZone={selectedZone}
@@ -250,11 +252,11 @@ function MacroAdmin({
   );
 }
 
-/** Panel de edición de zonas + config del lienzo. Solo super_admin. */
+/** Panel de edición de zonas + config del lienzo. Solo roles admin. */
 function ZoneInspector({
-  isSuper, canvasCfg, onCanvasCfg, selectedZone, selectedZoneId, nodes, setNodes, updateSelectedZone, onEnterZone,
+  canEdit, canvasCfg, onCanvasCfg, selectedZone, selectedZoneId, nodes, setNodes, updateSelectedZone, onEnterZone,
 }: {
-  isSuper: boolean;
+  canEdit: boolean;
   canvasCfg: CanvasConfig;
   onCanvasCfg: (cfg: CanvasConfig) => void;
   selectedZone: Zone | undefined;
@@ -264,7 +266,7 @@ function ZoneInspector({
   updateSelectedZone: (patch: Partial<Zone>) => void;
   onEnterZone: (zoneId: string) => void;
 }) {
-  if (!isSuper) return null;
+  if (!canEdit) return null;
 
   const wPx = selectedZone
     ? readNodeDimension(nodes.find((n) => n.id === selectedZoneId), 'width', selectedZone.width)
@@ -362,24 +364,24 @@ function ZoneInspector({
 }
 
 function MicroAdmin({
-  data, zone, isSuper, onBack, onSaved, onReload,
+  data, zone, canEdit, onBack, onSaved, onReload,
 }: {
   data: CanvasData;
   zone: Zone;
-  isSuper: boolean;
+  canEdit: boolean;
   onBack: () => void;
   onSaved: (msg: string) => void;
   onReload: () => void;
 }) {
   const zoneTables = useMemo(() => data.tables.filter((t) => t.zoneId === zone.id), [data.tables, zone.id]);
-  const [nodes, setNodes] = useState<TableFlowNode[]>(() => zoneTables.map((t) => tableToNode(t, zone.name, !isSuper)));
+  const [nodes, setNodes] = useState<TableFlowNode[]>(() => zoneTables.map((t) => tableToNode(t, zone.name, !canEdit)));
   const [selectedTableId, setSelectedTableId] = useState<string | null>(zoneTables[0]?.id ?? null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setNodes(zoneTables.map((t) => tableToNode(t, zone.name, !isSuper)));
+    setNodes(zoneTables.map((t) => tableToNode(t, zone.name, !canEdit)));
     setSelectedTableId((cur) => (cur && zoneTables.some((t) => t.id === cur) ? cur : zoneTables[0]?.id ?? null));
-  }, [zone.name, zoneTables, isSuper]);
+  }, [zone.name, zoneTables, canEdit]);
 
   const selectedTable = nodes.find((n) => n.id === selectedTableId)?.data.table;
 
@@ -463,7 +465,7 @@ function MicroAdmin({
           </div>
           <div className="canvas-toolbar">
             <button onClick={onBack}><ArrowLeft size={16} />Zonas</button>
-            {isSuper ? (
+            {canEdit ? (
               <>
                 <button onClick={createTable}><Plus size={16} />Mesa</button>
                 <button onClick={onReload}><RefreshCcw size={16} />Recargar</button>
@@ -482,7 +484,7 @@ function MicroAdmin({
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onSelectionChange={onSelectionChange}
-            nodesDraggable={isSuper}
+            nodesDraggable={canEdit}
             minZoom={0.35}
             maxZoom={2}
             fitView
@@ -496,7 +498,7 @@ function MicroAdmin({
       </div>
 
       <TableInspector
-        isSuper={isSuper}
+        canEdit={canEdit}
         selectedTable={selectedTable}
         widthM={pxToMeters(wPx)}
         heightM={pxToMeters(hPx)}
@@ -509,11 +511,11 @@ function MicroAdmin({
   );
 }
 
-/** Panel de edición de mesas. Solo super_admin. */
+/** Panel de edición de mesas. Solo roles admin. */
 function TableInspector({
-  isSuper, selectedTable, widthM, heightM, selectedTableId, setNodes, updateSelectedTable, deleteSelectedTable,
+  canEdit, selectedTable, widthM, heightM, selectedTableId, setNodes, updateSelectedTable, deleteSelectedTable,
 }: {
-  isSuper: boolean;
+  canEdit: boolean;
   selectedTable: RestaurantTable | undefined;
   widthM: number;
   heightM: number;
@@ -522,7 +524,7 @@ function TableInspector({
   updateSelectedTable: (patch: Partial<RestaurantTable>) => void;
   deleteSelectedTable: () => void;
 }) {
-  if (!isSuper) return null;
+  if (!canEdit) return null;
 
   return (
     <aside className="inspector">

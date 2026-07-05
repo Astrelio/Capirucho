@@ -4,13 +4,19 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { ArrowLeft, CalendarDays, Check, Clock, Save, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   getAvailability, loadCanvas, loadReservations, reserveTable, subscribeCanvas, timeSlots, todayInputValue,
 } from './service';
 import type { CanvasData, ReservationSlot, Zone } from './types';
 import { nodeTypes, tableToNode, zoneToNode, type TableFlowNode, type ZoneFlowNode } from './nodes';
 import './canvas.css';
+
+/** Ajusta una hora libre (ej. 18:47) al siguiente slot de reserva disponible. */
+function snapToSlot(time: string | null): string {
+  if (!time) return '19:00';
+  return timeSlots.find((slot) => slot >= time) ?? timeSlots[timeSlots.length - 1];
+}
 
 export default function PublicCanvas() {
   const [data, setData] = useState<CanvasData | null>(null);
@@ -107,11 +113,21 @@ function PublicMicro({
   onBack: () => void;
   onNotice: (msg: string) => void;
 }) {
-  const [date, setDate] = useState(todayInputValue());
-  const [time, setTime] = useState('19:00');
-  const [partySize, setPartySize] = useState(4);
-  const [guestName, setGuestName] = useState('');
-  const [guestPhone, setGuestPhone] = useState('');
+  // Precarga desde el formulario de /reservar (query params), si viene de ahí.
+  const [params] = useSearchParams();
+  const paramDate = params.get('date');
+  const paramGuests = Number(params.get('guests'));
+
+  const [date, setDate] = useState(
+    paramDate && paramDate >= todayInputValue() ? paramDate : todayInputValue(),
+  );
+  const [time, setTime] = useState(snapToSlot(params.get('time')));
+  const [partySize, setPartySize] = useState(
+    Number.isFinite(paramGuests) && paramGuests >= 1 ? paramGuests : 4,
+  );
+  const [guestName, setGuestName] = useState(params.get('name') ?? '');
+  const [guestPhone, setGuestPhone] = useState(params.get('phone') ?? '');
+  const notes = params.get('notes') ?? '';
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [reservations, setReservations] = useState<ReservationSlot[]>([]);
   const [reserving, setReserving] = useState(false);
@@ -164,6 +180,7 @@ function PublicMicro({
         date,
         time,
         partySize,
+        notes: notes.trim() || undefined,
       });
 
       if (!result.ok) {

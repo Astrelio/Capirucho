@@ -11,6 +11,7 @@ import AdminCanvas from './features/canvas/AdminCanvas';
 import MenuManager from './features/admin/MenuManager';
 import ReservationList from './features/admin/ReservationList';
 import ReviewsAdmin from './features/admin/ReviewsAdmin';
+import UsersAdmin from './features/admin/UsersAdmin';
 import DashboardPage from './features/dashboard/DashboardPage';
 
 export default function App() {
@@ -29,9 +30,13 @@ export default function App() {
           <Route path="menu" element={<MenuManager />} />
           <Route path="reservations" element={<ReservationList />} />
           <Route path="reviews" element={<ReviewsAdmin />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route element={<ProtectedRoute allow={['super_admin']} />}>
+            <Route path="users" element={<UsersAdmin />} />
+          </Route>
         </Route>
-        <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
+      <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
     </Routes>
   );
 }
