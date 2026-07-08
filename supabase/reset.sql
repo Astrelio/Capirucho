@@ -169,6 +169,7 @@ create or replace function atomic_reserve(
 ) returns uuid
 language plpgsql
 security definer
+set search_path = public, pg_temp
 as $$
 declare
   v_conflict int;
@@ -198,6 +199,137 @@ begin
   return v_reservation_id;
 end;
 $$;
+
+-- ---------- ROW LEVEL SECURITY ----------
+-- El frontend usa la anon key (publica, incrustada en el bundle de Vite).
+-- Sin RLS, cualquiera con esa key puede leer/escribir TODAS las tablas via
+-- PostgREST (PII de clientes, auto-escalar su rol a admin, etc.).
+-- Estas politicas cierran ese hueco. security definer + search_path fijo evita
+-- recursion de RLS y secuestro de search_path.
+
+create or replace function is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select exists (
+    select 1 from profiles
+    where user_id = auth.uid()
+      and role in ('admin', 'super_admin')
+  );
+$$;
+
+-- Evita que un usuario autenticado se auto-escale el rol via UPDATE directo.
+-- auth.uid() es null para service_role / SQL editor, que si pueden asignar roles.
+create or replace function prevent_role_escalation()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if auth.uid() is not null
+     and new.role is distinct from old.role
+     and not is_admin() then
+    raise exception 'No autorizado para cambiar el rol';
+  end if;
+  return new;
+end;
+$$;
+
+alter table restaurants     enable row level security;
+alter table profiles        enable row level security;
+alter table zones           enable row level security;
+alter table tables          enable row level security;
+alter table reservations    enable row level security;
+alter table waitlist        enable row level security;
+alter table menu_categories enable row level security;
+alter table menu_items      enable row level security;
+alter table reviews         enable row level security;
+
+-- Datos publicos del sitio (solo lectura para todos; escritura solo admin).
+drop policy if exists restaurants_read on restaurants;
+create policy restaurants_read on restaurants for select using (true);
+drop policy if exists restaurants_write on restaurants;
+create policy restaurants_write on restaurants for all using (is_admin()) with check (is_admin());
+
+drop policy if exists zones_read on zones;
+create policy zones_read on zones for select using (true);
+drop policy if exists zones_write on zones;
+create policy zones_write on zones for all using (is_admin()) with check (is_admin());
+
+drop policy if exists tables_read on tables;
+create policy tables_read on tables for select using (true);
+drop policy if exists tables_write on tables;
+create policy tables_write on tables for all using (is_admin()) with check (is_admin());
+
+drop policy if exists menu_categories_read on menu_categories;
+create policy menu_categories_read on menu_categories for select using (true);
+drop policy if exists menu_categories_write on menu_categories;
+create policy menu_categories_write on menu_categories for all using (is_admin()) with check (is_admin());
+
+drop policy if exists menu_items_read on menu_items;
+create policy menu_items_read on menu_items for select using (true);
+drop policy if exists menu_items_write on menu_items;
+create policy menu_items_write on menu_items for all using (is_admin()) with check (is_admin());
+
+-- Perfiles: cada quien ve/edita el suyo; admins todo. El rol lo protege el trigger.
+drop policy if exists profiles_select on profiles;
+create policy profiles_select on profiles for select
+  using (user_id = auth.uid() or is_admin());
+drop policy if exists profiles_insert on profiles;
+create policy profiles_insert on profiles for insert
+  with check (user_id = auth.uid() or is_admin());
+drop policy if exists profiles_update on profiles;
+create policy profiles_update on profiles for update
+  using (user_id = auth.uid() or is_admin())
+  with check (user_id = auth.uid() or is_admin());
+drop trigger if exists trg_prevent_role_escalation on profiles;
+create trigger trg_prevent_role_escalation
+  before update on profiles
+  for each row execute function prevent_role_escalation();
+
+-- Reservas: contienen PII. El cliente solo ve las suyas; admin todo.
+-- Las inserciones van por atomic_reserve() (security definer), no directo.
+drop policy if exists reservations_select on reservations;
+create policy reservations_select on reservations for select
+  using (user_id = auth.uid() or is_admin());
+drop policy if exists reservations_modify on reservations;
+create policy reservations_modify on reservations for update
+  using (user_id = auth.uid() or is_admin())
+  with check (user_id = auth.uid() or is_admin());
+drop policy if exists reservations_delete on reservations;
+create policy reservations_delete on reservations for delete
+  using (is_admin());
+
+-- Waitlist: cualquiera puede anotarse; solo admin la lee/gestiona.
+drop policy if exists waitlist_insert on waitlist;
+create policy waitlist_insert on waitlist for insert with check (true);
+drop policy if exists waitlist_manage on waitlist;
+create policy waitlist_manage on waitlist for select using (is_admin());
+drop policy if exists waitlist_update on waitlist;
+create policy waitlist_update on waitlist for update using (is_admin()) with check (is_admin());
+drop policy if exists waitlist_delete on waitlist;
+create policy waitlist_delete on waitlist for delete using (is_admin());
+
+-- Reseñas: lectura publica; cualquiera puede dejar una; admin modera.
+drop policy if exists reviews_read on reviews;
+create policy reviews_read on reviews for select using (true);
+drop policy if exists reviews_insert on reviews;
+create policy reviews_insert on reviews for insert with check (true);
+drop policy if exists reviews_update on reviews;
+create policy reviews_update on reviews for update
+  using (user_id = auth.uid() or is_admin())
+  with check (user_id = auth.uid() or is_admin());
+drop policy if exists reviews_delete on reviews;
+create policy reviews_delete on reviews for delete using (is_admin());
+
+-- Permite invocar el RPC de reserva sin exponer INSERT directo a reservations.
+grant execute on function atomic_reserve(
+  uuid, uuid, uuid, text, text, text, date, time, time, int, text
+) to anon, authenticated;
 
 -- ---------- REALTIME (idempotente) ----------
 
